@@ -57,12 +57,13 @@
                 <Grid DockPanel.Dock="Top" Height="28" Background="Transparent" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                         <Button Style="{StaticResource TrafficLight}" Background="#FF5F57" ToolTip="Close" Click="Close_Click">
-                            <Path Data="M0,0 L7,7 M7,0 L0,7" Stroke="#7A0F0A" StrokeThickness="1.7"
-                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" SnapsToDevicePixels="False" />
+                            <!-- 14x14 box, same as the circle, symbol centered on (7,7) -->
+                            <Path Width="14" Height="14" Stretch="None" Data="M3.75,3.75 L10.25,10.25 M10.25,3.75 L3.75,10.25"
+                                  Stroke="#7A0F0A" StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
                         </Button>
                         <Button Style="{StaticResource TrafficLight}" Background="#FEBC2E" ToolTip="Minimize" Click="Minimize_Click" Margin="8,0,0,0">
-                            <Path Data="M0,0 L8,0" Stroke="#7A4A00" StrokeThickness="1.8"
-                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round" SnapsToDevicePixels="False" />
+                            <Path Width="14" Height="14" Stretch="None" Data="M3.25,7 L10.75,7"
+                                  Stroke="#7A4A00" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
                         </Button>
                     </StackPanel>
                 </Grid>
