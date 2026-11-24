@@ -1,4 +1,8 @@
-﻿# ProjetoWidget
+﻿<p align="center">
+  <img src="docs/logo.png" alt="ProjetoWidget logo" width="200">
+</p>
+
+# ProjetoWidget
 
 Desktop widgets for Windows in the style of macOS widgets: clean, simple, square, with rounded corners, and pinned to the wallpaper.
 
