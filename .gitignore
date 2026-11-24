@@ -1,0 +1,24 @@
+# Build
+bin/
+obj/
+dist/
+build/
+out/
+*.exe
+*.pdb
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Sistema
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local
+.claude/settings.local.json
+.env
