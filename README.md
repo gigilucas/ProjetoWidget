@@ -31,9 +31,22 @@ Glass-style mockups of the five widgets, based on the first Canva sketches (desi
 
 The mockups are built in [`design/widget-mockups.html`](design/widget-mockups.html) and exported to PNG with [`design/render.ps1`](design/render.ps1) (headless Microsoft Edge).
 
-| Clock | CPU / RAM | Calendar | Weather | Music |
-| --- | --- | --- | --- | --- |
-| ![Clock](docs/references/clock.png) | ![CPU/RAM](docs/references/cpu-ram.png) | ![Calendar](docs/references/calendar.png) | ![Weather](docs/references/weather.png) | ![Music](docs/references/music.png) |
+<table>
+  <tr>
+    <th width="20%">Clock</th>
+    <th width="20%">CPU / RAM</th>
+    <th width="20%">Calendar</th>
+    <th width="20%">Weather</th>
+    <th width="20%">Music</th>
+  </tr>
+  <tr>
+    <td><img src="docs/references/clock.png" alt="Clock" width="160"></td>
+    <td><img src="docs/references/cpu-ram.png" alt="CPU/RAM" width="160"></td>
+    <td><img src="docs/references/calendar.png" alt="Calendar" width="160"></td>
+    <td><img src="docs/references/weather.png" alt="Weather" width="160"></td>
+    <td><img src="docs/references/music.png" alt="Music" width="160"></td>
+  </tr>
+</table>
 
 ## Window behavior
 
