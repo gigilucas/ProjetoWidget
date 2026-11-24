@@ -1,50 +1,50 @@
-# ProjetoWidget
+﻿# ProjetoWidget
 
-Widgets para o ambiente de trabalho do Windows, ao estilo dos widgets do macOS: bonitos, de cantos arredondados, simples e quadrados, presos ao wallpaper.
+Desktop widgets for Windows in the style of macOS widgets: clean, simple, square, with rounded corners, and pinned to the wallpaper.
 
-A aplicação é distribuída como um `.exe` para PC.
+The app ships as a `.exe` for PC.
 
-## Objetivo
+## Goals
 
-- Widgets com visual limpo, quadrados e de cantos arredondados, inspirados no macOS.
-- Os widgets ficam **agarrados ao wallpaper**: não aparecem na barra de tarefas, não ficam por cima das outras janelas e mantêm-se no fundo do ambiente de trabalho.
-- Cada widget pode ser **arrastado** para qualquer posição do ecrã, e a posição fica guardada.
-- Uma **pequena interface de gestão** para escolher que widgets mostrar.
+- Clean, square widgets with rounded corners, inspired by macOS.
+- Widgets are **pinned to the wallpaper**: they don't show up in the taskbar, never sit on top of other windows, and stay on the desktop background.
+- Every widget can be **dragged** anywhere on the screen, and its position is saved.
+- A **small manager window** to pick which widgets are shown.
 
 ## Widgets
 
-| Widget | Descrição |
+| Widget | Description |
 | --- | --- |
-| **Relógio** | Relógio analógico com a hora digital por baixo. |
-| **CPU / RAM** | Utilização e temperatura do processador e uso da memória em tempo real. |
-| **Calendário** | Vista do mês atual com o dia de hoje assinalado. |
-| **Tempo** | Temperatura, estado do tempo e cidade. |
-| **Música** | Capa do álbum e controlos de reprodução (anterior, play/pausa, seguinte, volume), ligado ao Spotify, Apple Music ou outra app de música. |
+| **Clock** | Analog clock with the digital time underneath. |
+| **CPU / RAM** | Live CPU usage and temperature, plus memory usage. |
+| **Calendar** | Current month view with today highlighted. |
+| **Weather** | Temperature, conditions and city. |
+| **Music** | Album art and playback controls (previous, play/pause, next, volume), connected to Spotify, Apple Music or any other music app. |
 
-## Referências visuais
+## Visual references
 
-Imagens de referência feitas no Canva (design **City**). Não são as finais, mas mostram o estilo pretendido: fundo em gradiente azul → rosa, ícones grandes e informação essencial.
+Reference images made in Canva (design **City**). They aren't final, but they show the intended style: a blue → pink gradient background, large icons and only the essential information.
 
-| Relógio | CPU / RAM | Calendário | Tempo | Música |
+| Clock | CPU / RAM | Calendar | Weather | Music |
 | --- | --- | --- | --- | --- |
-| ![Relógio](docs/referencias/relogio.png) | ![CPU/RAM](docs/referencias/cpu-ram.png) | ![Calendário](docs/referencias/calendario.png) | ![Tempo](docs/referencias/tempo.png) | ![Música](docs/referencias/musica.png) |
+| ![Clock](docs/references/clock.png) | ![CPU/RAM](docs/references/cpu-ram.png) | ![Calendar](docs/references/calendar.png) | ![Weather](docs/references/weather.png) | ![Music](docs/references/music.png) |
 
-## Comportamento da janela
+## Window behavior
 
-O ponto mais importante do projeto é cada widget comportar-se como parte do ambiente de trabalho:
+The key part of the project is making each widget behave like part of the desktop:
 
-- **Sem barra de tarefas**: as janelas dos widgets não aparecem na barra de tarefas nem no Alt+Tab.
-- **Preso ao fundo**: o widget é colocado atrás das janelas normais, ao nível dos ícones do ambiente de trabalho, e continua visível quando se usa "Mostrar ambiente de trabalho" (Win+D).
-- **Arrastar livremente**: clicar e arrastar move o widget, e a posição é guardada para o próximo arranque.
-- **Arranque com o Windows** (opcional).
+- **No taskbar entry**: widget windows don't appear in the taskbar or in Alt+Tab.
+- **Pinned to the background**: widgets sit behind normal windows, at the same level as the desktop icons, and stay visible after "Show desktop" (Win+D).
+- **Free dragging**: click and drag to move a widget; the position is remembered on the next launch.
+- **Start with Windows** (optional).
 
-## Notas técnicas (proposta)
+## Technical notes (proposal)
 
-- Para prender os widgets ao wallpaper, a janela é associada à janela `WorkerW`/`Progman` do Windows (a mesma camada onde ficam os ícones do ambiente de trabalho).
-- O widget de **música** pode usar a API de sessões de media do Windows (`GlobalSystemMediaTransportControlsSessionManager`), que funciona com o Spotify, Apple Music e outras apps sem precisar de login.
-- O widget de **tempo** usa uma API meteorológica pública.
-- Stack ainda por decidir (por exemplo C# / .NET com WPF).
+- To pin widgets to the wallpaper, each window is parented to Windows' `WorkerW`/`Progman` window (the same layer that holds the desktop icons).
+- The **Music** widget can use the Windows media session API (`GlobalSystemMediaTransportControlsSessionManager`), which works with Spotify, Apple Music and other apps without any login.
+- The **Weather** widget uses a public weather API.
+- Tech stack still to be decided (for example C# / .NET with WPF).
 
-## Estado
+## Status
 
-🚧 Em fase inicial: definição do design e da estrutura do projeto.
+🚧 Early stage: defining the design and the project structure.
