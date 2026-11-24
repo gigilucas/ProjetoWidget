@@ -25,6 +25,16 @@ The app ships as a `.exe` for PC.
 | **Weather** | Temperature, conditions and city. |
 | **Music** | Album art and playback controls (previous, play/pause, next, volume), connected to Spotify, Apple Music or any other music app. |
 
+## The app
+
+The manager window lists the five widgets, each with an Apple-style on/off switch. It uses the same glass look and colors as the logo. Your choices are saved in `%AppData%\ProjetoWidget\settings.json`.
+
+<p align="center">
+  <img src="docs/app-screenshot.png" alt="ProjetoWidget manager window" width="340">
+</p>
+
+> The switches only save your choice for now; the widgets themselves come next.
+
 ## Visual references
 
 Glass-style mockups of the five widgets, based on the first Canva sketches (design **City**) and on the app logo: frosted translucent cards with rounded corners, a soft blue → pink → orange palette and only the essential information. They aren't final.
@@ -49,13 +59,45 @@ The key part of the project is making each widget behave like part of the deskto
 - **Free dragging**: click and drag to move a widget; the position is remembered on the next launch.
 - **Start with Windows** (optional).
 
-## Technical notes (proposal)
+## Tech stack
 
-- To pin widgets to the wallpaper, each window is parented to Windows' `WorkerW`/`Progman` window (the same layer that holds the desktop icons).
-- The **Music** widget can use the Windows media session API (`GlobalSystemMediaTransportControlsSessionManager`), which works with Spotify, Apple Music and other apps without any login.
-- The **Weather** widget uses a public weather API.
-- Tech stack still to be decided (for example C# / .NET with WPF).
+- **C# / .NET 10 / WPF**: a native Windows desktop app, published as a single `.exe`.
+- To pin widgets to the wallpaper, each widget window will be parented to Windows' `WorkerW`/`Progman` window (the same layer that holds the desktop icons).
+- The **Music** widget will use the Windows media session API (`GlobalSystemMediaTransportControlsSessionManager`), which works with Spotify, Apple Music and other apps without any login.
+- The **Weather** widget will use a public weather API.
+
+## Getting started
+
+Requirements: Windows 10/11 and the [.NET 10 SDK](https://dotnet.microsoft.com/download).
+
+Run from source:
+
+```powershell
+dotnet run --project src/ProjetoWidget
+```
+
+Build the `.exe` (self-contained, no .NET install needed on the target PC):
+
+```powershell
+dotnet publish src/ProjetoWidget -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish
+```
+
+The app ends up in `publish/ProjetoWidget.exe`.
+
+Other helpers:
+
+- `ProjetoWidget.exe --screenshot out.png` saves an image of the manager window and exits.
+- [`tools/make-icon.ps1`](tools/make-icon.ps1) rebuilds the app icon from `docs/logo.png`.
+
+## Project structure
+
+```
+src/ProjetoWidget/        WPF app (manager window, settings, assets)
+design/                   HTML mockups of the widgets and the script that exports them
+docs/                     Logo, app screenshot and widget reference images
+tools/                    Helper scripts
+```
 
 ## Status
 
-🚧 Early stage: defining the design and the project structure.
+🚧 Manager window done (list of widgets with on/off switches). Next: the widget windows themselves, pinned to the wallpaper.
