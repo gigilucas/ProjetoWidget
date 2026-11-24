@@ -27,7 +27,9 @@ The app ships as a `.exe` for PC.
 
 ## Visual references
 
-Reference images made in Canva (design **City**). They aren't final, but they show the intended style: a blue → pink gradient background, large icons and only the essential information.
+Glass-style mockups of the five widgets, based on the first Canva sketches (design **City**) and on the app logo: frosted translucent cards with rounded corners, a soft blue → pink → orange palette and only the essential information. They aren't final.
+
+The mockups are built in [`design/widget-mockups.html`](design/widget-mockups.html) and exported to PNG with [`design/render.ps1`](design/render.ps1) (headless Microsoft Edge).
 
 | Clock | CPU / RAM | Calendar | Weather | Music |
 | --- | --- | --- | --- | --- |

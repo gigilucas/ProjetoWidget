@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ProjetoWidget - Glass widget mockups</title>
+<!--
+  Glass-style mockups for the 5 widgets, matching the app logo.
+  Open with #clock, #cpu-ram, #calendar, #weather or #music to show a single widget
+  (used to export the PNGs in docs/references). No hash shows all of them.
+-->
+<style>
+  :root {
+    --blue: #4f7cff;
+    --sky: #3fb8ff;
+    --pink: #ff5fa8;
+    --orange: #ffb13d;
+    --purple: #8b5cff;
+    --ink: #1c1b2e;
+    --ink-soft: rgba(28, 27, 46, .55);
+    --card: 400px;
+    --radius: 92px;
+    --font: "Segoe UI Variable Display", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); color: var(--ink); background: #e9ebf6; }
+
+  .scenes { display: flex; flex-wrap: wrap; gap: 0; }
+  body.single .scene { display: none; }
+  body.single .scene.active { display: grid; }
+
+  /* Colorful backdrop so the glass has something to refract, using the logo palette */
+  .scene {
+    position: relative; width: 512px; height: 512px; display: grid; place-items: center;
+    overflow: hidden; background: linear-gradient(135deg, #dfe6ff 0%, #f3e6f7 55%, #fdeee2 100%);
+  }
+  .scene::before, .scene::after, .blob {
+    content: ""; position: absolute; border-radius: 50%; filter: blur(46px); opacity: .9;
+  }
+  .scene::before { width: 300px; height: 300px; left: -40px; top: -30px; background: var(--blue); }
+  .scene::after  { width: 280px; height: 280px; right: -50px; bottom: -40px; background: var(--pink); }
+  .blob.b1 { width: 200px; height: 200px; right: 30px; top: 10px; background: var(--orange); opacity: .75; }
+  .blob.b2 { width: 190px; height: 190px; left: 20px; bottom: 0; background: var(--purple); opacity: .7; }
+
+  /* The glass card */
+  .glass {
+    position: relative; z-index: 1; width: var(--card); height: var(--card); border-radius: var(--radius);
+    background: linear-gradient(145deg, rgba(255,255,255,.62) 0%, rgba(255,255,255,.28) 55%, rgba(255,255,255,.4) 100%);
+    backdrop-filter: blur(30px) saturate(170%);
+    -webkit-backdrop-filter: blur(30px) saturate(170%);
+    border: 1.5px solid rgba(255,255,255,.75);
+    box-shadow:
+      0 30px 60px -10px rgba(60, 40, 130, .35),
+      0 8px 18px rgba(60, 40, 130, .12),
+      inset 0 2px 0 rgba(255,255,255,.95),
+      inset 0 -14px 36px rgba(255,255,255,.22),
+      inset 0 0 0 6px rgba(255,255,255,.12);
+    overflow: hidden; padding: 34px;
+  }
+  /* specular sheen, top-left like the logo */
+  .glass::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background:
+      radial-gradient(120px 80px at 22% 8%, rgba(255,255,255,.85), transparent 70%),
+      linear-gradient(160deg, rgba(255,255,255,.45) 0%, transparent 38%);
+    mix-blend-mode: screen;
+  }
+  /* soft iridescent rim at the bottom */
+  .glass::after {
+    content: ""; position: absolute; left: 10%; right: 10%; bottom: 0; height: 40%; pointer-events: none;
+    background: linear-gradient(90deg, rgba(79,124,255,.18), rgba(255,95,168,.16), rgba(255,177,61,.18));
+    filter: blur(24px);
+  }
+  .content { position: relative; z-index: 2; width: 100%; height: 100%; }
+  .label { font-size: 15px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+
+  /* ---------- Clock ---------- */
+  .clock .content { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+  .clock svg { width: 260px; height: 260px; filter: drop-shadow(0 6px 14px rgba(60,40,130,.18)); }
+  .clock .digital { font-size: 30px; font-weight: 600; letter-spacing: .02em; }
+  .clock .digital span { color: var(--ink-soft); font-weight: 500; font-size: 22px; margin-left: 4px; }
+
+  /* ---------- CPU / RAM ---------- */
+  .cpu .content { display: flex; flex-direction: column; justify-content: space-between; }
+  .cpu .rings { display: flex; justify-content: space-between; }
+  .cpu .ring { width: 150px; text-align: center; }
+  .cpu .ring svg { width: 150px; height: 150px; }
+  .cpu .ring .value { font-size: 34px; font-weight: 650; }
+  .cpu .ring .name { font-size: 20px; font-weight: 650; margin-top: 8px; }
+  .cpu .ring .sub { font-size: 16px; color: var(--ink-soft); margin-top: 2px; }
+  .cpu .head { display: flex; align-items: center; justify-content: space-between; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--ink-soft);
+          background: rgba(255,255,255,.45); border: 1px solid rgba(255,255,255,.8); padding: 6px 12px; border-radius: 999px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: linear-gradient(135deg, var(--sky), var(--pink)); }
+
+  /* ---------- Calendar ---------- */
+  .calendar .month { font-size: 20px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+                     background: linear-gradient(90deg, var(--pink), var(--orange)); -webkit-background-clip: text; color: transparent; }
+  .calendar .year { font-size: 20px; font-weight: 600; color: var(--ink-soft); margin-left: 6px; }
+  .calendar .grid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 6px; margin-top: 16px; text-align: center; }
+  .calendar .wd { font-size: 14px; font-weight: 700; color: var(--ink-soft); padding-bottom: 6px; }
+  .calendar .d { font-size: 19px; font-weight: 600; height: 38px; line-height: 38px; }
+  .calendar .d.weekend { color: var(--ink-soft); }
+  .calendar .d.today { color: #fff; position: relative; }
+  .calendar .d.today::before { content: ""; position: absolute; left: 50%; top: 50%; width: 38px; height: 38px; transform: translate(-50%, -50%);
+    border-radius: 50%; z-index: -1; background: linear-gradient(135deg, var(--blue), var(--pink) 60%, var(--orange));
+    box-shadow: 0 4px 12px rgba(255,95,168,.45), inset 0 1px 0 rgba(255,255,255,.6); }
+  .calendar .d.today { z-index: 0; }
+
+  /* ---------- Weather ---------- */
+  .weather .content { display: flex; flex-direction: column; justify-content: space-between; }
+  .weather .city { font-size: 24px; font-weight: 650; display: flex; align-items: center; gap: 8px; }
+  .weather .temp { font-size: 96px; font-weight: 300; line-height: 1; letter-spacing: -.03em; margin-top: 4px; }
+  .weather .icon { position: absolute; right: -6px; top: 18px; width: 170px; height: 140px; }
+  .sun { position: absolute; right: 18px; top: 0; width: 92px; height: 92px; border-radius: 50%;
+         background: radial-gradient(circle at 35% 30%, #fff3c4, var(--orange) 55%, #ff8a3d);
+         box-shadow: 0 0 40px rgba(255,177,61,.8); }
+  .cloud { position: absolute; left: 0; bottom: 6px; width: 150px; height: 70px; border-radius: 40px;
+           background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.7));
+           box-shadow: 0 10px 24px rgba(60,40,130,.2), inset 0 -6px 12px rgba(200,205,235,.6); }
+  .cloud::before, .cloud::after { content: ""; position: absolute; border-radius: 50%; background: inherit; }
+  .cloud::before { width: 78px; height: 78px; left: 22px; top: -40px; }
+  .cloud::after  { width: 58px; height: 58px; left: 78px; top: -24px; }
+  .weather .cond { font-size: 20px; font-weight: 600; }
+  .weather .hl { font-size: 17px; color: var(--ink-soft); margin-top: 2px; }
+  .weather .hours { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,.7); }
+  .weather .hour { text-align: center; font-size: 15px; color: var(--ink-soft); }
+  .weather .hour b { display: block; font-size: 18px; color: var(--ink); font-weight: 600; margin-top: 4px; }
+
+  /* ---------- Music ---------- */
+  .music .content { display: flex; flex-direction: column; justify-content: space-between; }
+  .music .top { display: flex; gap: 18px; align-items: center; }
+  .art { width: 136px; height: 136px; border-radius: 30px; flex: none; position: relative; overflow: hidden;
+         background: linear-gradient(135deg, var(--sky), var(--blue) 30%, var(--purple) 55%, var(--pink) 78%, var(--orange));
+         box-shadow: 0 12px 26px rgba(60,40,130,.3), inset 0 1px 0 rgba(255,255,255,.7); }
+  .art::after { content: ""; position: absolute; inset: 0;
+                background: radial-gradient(70px 50px at 30% 20%, rgba(255,255,255,.65), transparent 70%); }
+  .music .title { font-size: 23px; font-weight: 700; }
+  .music .artist { font-size: 18px; color: var(--ink-soft); margin-top: 4px; }
+  .music .source { margin-top: 12px; }
+  .bar { height: 7px; border-radius: 99px; background: rgba(255,255,255,.6); position: relative; overflow: visible; }
+  .bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 38%; border-radius: inherit;
+           background: linear-gradient(90deg, var(--blue), var(--pink)); }
+  .bar i::after { content: ""; position: absolute; right: -7px; top: 50%; width: 15px; height: 15px; transform: translateY(-50%);
+                  border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(60,40,130,.35); }
+  .times { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
+  .controls { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+  .controls svg { width: 26px; height: 26px; fill: var(--ink); }
+  .controls .small svg { width: 22px; height: 22px; fill: var(--ink-soft); }
+  .play { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+          background: linear-gradient(135deg, var(--blue), var(--pink) 65%, var(--orange));
+          box-shadow: 0 8px 18px rgba(255,95,168,.45), inset 0 1px 0 rgba(255,255,255,.7); }
+  .play svg { fill: #fff !important; width: 28px !important; height: 28px !important; }
+</style>
+</head>
+<body>
+<div class="scenes">
+
+  <!-- Clock -->
+  <section class="scene" id="clock"><i class="blob b1"></i><i class="blob b2"></i>
+    <div class="glass clock"><div class="content">
+      <svg viewBox="0 0 200 200" aria-label="Analog clock showing 12:24">
+        <defs>
+          <linearGradient id="hand" gradientUnits="userSpaceOnUse" x1="100" y1="100" x2="100" y2="52">
+            <stop offset="0" stop-color="#4f7cff"/><stop offset="1" stop-color="#ff5fa8"/>
+          </linearGradient>
+          <radialGradient id="face" cx=".35" cy=".3" r=".8">
+            <stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".35"/>
+          </radialGradient>
+        </defs>
+        <circle cx="100" cy="100" r="96" fill="url(#face)" stroke="rgba(255,255,255,.95)" stroke-width="2"/>
+        <g id="ticks"></g>
+        <g font-family="Segoe UI Variable Display, Segoe UI, sans-serif" font-size="16" font-weight="600" fill="#1c1b2e" text-anchor="middle">
+          <text x="100" y="32">12</text><text x="171" y="106">3</text><text x="100" y="180">6</text><text x="29" y="106">9</text>
+        </g>
+        <!-- 12:24:38 -->
+        <line x1="100" y1="100" x2="100" y2="52" stroke="url(#hand)" stroke-width="7" stroke-linecap="round" transform="rotate(12 100 100)"/>
+        <line x1="100" y1="100" x2="100" y2="30" stroke="#1c1b2e" stroke-width="4.5" stroke-linecap="round" transform="rotate(144 100 100)"/>
+        <line x1="100" y1="114" x2="100" y2="26" stroke="#ffb13d" stroke-width="2" stroke-linecap="round" transform="rotate(228 100 100)"/>
+        <circle cx="100" cy="100" r="6" fill="#ffb13d" stroke="#fff" stroke-width="2"/>
+      </svg>
+      <div class="digital">12:24<span>PM</span></div>
+    </div></div>
+  </section>
+
+  <!-- CPU / RAM -->
+  <section class="scene" id="cpu-ram"><i class="blob b1"></i><i class="blob b2"></i>
+    <div class="glass cpu"><div class="content">
+      <div class="head"><span class="label">System</span><span class="chip"><i class="dot"></i>Live</span></div>
+      <div class="rings">
+        <div class="ring" data-value="36" data-text="36%"><div class="name">CPU</div><div class="sub">48 °C</div></div>
+        <div class="ring" data-value="62" data-text="62%"><div class="name">RAM</div><div class="sub">9.9 / 16 GB</div></div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- Calendar -->
+  <section class="scene" id="calendar"><i class="blob b1"></i><i class="blob b2"></i>
+    <div class="glass calendar"><div class="content">
+      <div><span class="month">November</span><span class="year">2026</span></div>
+      <div class="grid" id="cal"></div>
+    </div></div>
+  </section>
+
+  <!-- Weather -->
+  <section class="scene" id="weather"><i class="blob b1"></i><i class="blob b2"></i>
+    <div class="glass weather"><div class="content">
+      <div class="icon"><div class="sun"></div><div class="cloud"></div></div>
+      <div>
+        <div class="city">City
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M21 3 3 10.5l7.5 3L14 21z" fill="#1c1b2e"/></svg>
+        </div>
+        <div class="temp">18°</div>
+      </div>
+      <div>
+        <div class="cond">Partly Cloudy</div>
+        <div class="hl">H:21°  L:12°</div>
+        <div class="hours">
+          <div class="hour">Now<b>18°</b></div><div class="hour">13h<b>19°</b></div>
+          <div class="hour">14h<b>21°</b></div><div class="hour">15h<b>20°</b></div><div class="hour">16h<b>18°</b></div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- Music -->
+  <section class="scene" id="music"><i class="blob b1"></i><i class="blob b2"></i>
+    <div class="glass music"><div class="content">
+      <div class="top">
+        <div class="art"></div>
+        <div>
+          <div class="title">Song Title</div>
+          <div class="artist">Artist Name</div>
+          <div class="source chip"><i class="dot"></i>Spotify</div>
+        </div>
+      </div>
+      <div>
+        <div class="bar"><i></i></div>
+        <div class="times"><span>1:24</span><span>-2:21</span></div>
+      </div>
+      <div class="controls">
+        <span class="small"><svg viewBox="0 0 24 24"><path d="M17 3l4 4-4 4V8h-2.5l-7 9H3v-2h3.5l7-9H17zM3 7h3.5l2.2 2.8-1.3 1.6L5.5 9H3zm14 6 4 4-4 4v-3h-3.5l-2.2-2.8 1.3-1.6 1.9 2.4H17z"/></svg></span>
+        <svg viewBox="0 0 24 24"><path d="M6 5h2.5v14H6zm3.5 7L19 5v14z"/></svg>
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
+        <svg viewBox="0 0 24 24"><path d="M15.5 5H18v14h-2.5zM5 5l9.5 7L5 19z"/></svg>
+        <span class="small"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg></span>
+      </div>
+    </div></div>
+  </section>
+
+</div>
+<script>
+  // clock ticks
+  const ticks = document.getElementById('ticks');
+  for (let i = 0; i < 60; i++) {
+    const major = i % 5 === 0;
+    const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    l.setAttribute('x1', 100); l.setAttribute('x2', 100);
+    l.setAttribute('y1', major ? 10 : 9); l.setAttribute('y2', major ? 20 : 14);
+    l.setAttribute('stroke', major ? '#1c1b2e' : 'rgba(28,27,46,.35)');
+    l.setAttribute('stroke-width', major ? 3 : 1.5);
+    l.setAttribute('stroke-linecap', 'round');
+    l.setAttribute('transform', `rotate(${i * 6} 100 100)`);
+    if (![0, 15, 30, 45].includes(i)) ticks.appendChild(l);
+  }
+
+  // CPU / RAM rings
+  document.querySelectorAll('.ring').forEach((el, idx) => {
+    const v = +el.dataset.value, r = 62, c = 2 * Math.PI * r;
+    el.insertAdjacentHTML('afterbegin', `
+      <svg viewBox="0 0 150 150">
+        <defs><linearGradient id="rg${idx}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="${idx ? '#8b5cff' : '#3fb8ff'}"/>
+          <stop offset="1" stop-color="${idx ? '#ffb13d' : '#ff5fa8'}"/></linearGradient></defs>
+        <circle cx="75" cy="75" r="${r}" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="14"/>
+        <circle cx="75" cy="75" r="${r}" fill="none" stroke="url(#rg${idx})" stroke-width="14" stroke-linecap="round"
+                stroke-dasharray="${c * v / 100} ${c}" transform="rotate(-90 75 75)"/>
+        <text x="75" y="87" text-anchor="middle" font-family="Segoe UI Variable Display, Segoe UI, sans-serif"
+              font-size="34" font-weight="650" fill="#1c1b2e">${el.dataset.text}</text>
+      </svg>`);
+  });
+
+  // calendar: November 2026 starts on a Sunday, Monday-first grid, today = 24
+  const cal = document.getElementById('cal');
+  ['M', 'T', 'W', 'T', 'F', 'S', 'S'].forEach(d => cal.insertAdjacentHTML('beforeend', `<div class="wd">${d}</div>`));
+  for (let i = 0; i < 6; i++) cal.insertAdjacentHTML('beforeend', '<div></div>');
+  for (let d = 1; d <= 30; d++) {
+    const col = (6 + d - 1) % 7;
+    const cls = ['d', col >= 5 ? 'weekend' : '', d === 24 ? 'today' : ''].join(' ');
+    cal.insertAdjacentHTML('beforeend', `<div class="${cls}">${d}</div>`);
+  }
+
+  // single-widget mode for exporting
+  const id = location.hash.slice(1);
+  if (id && document.getElementById(id)) {
+    document.body.classList.add('single');
+    document.getElementById(id).classList.add('active');
+  }
+</script>
+</body>
+</html>
