@@ -84,10 +84,10 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Grid>
-                            <Ellipse Fill="{TemplateBinding Background}" Stroke="#26000000" StrokeThickness="0.5" />
-                            <TextBlock x:Name="Glyph" Text="{TemplateBinding Content}" FontFamily="{StaticResource IconFont}"
-                                       FontSize="7" Foreground="#99000000" Opacity="0"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Ellipse Fill="{TemplateBinding Background}" Stroke="#33000000" StrokeThickness="0.5" />
+                            <!-- Symbol drawn as vector lines so it stays sharp at this small size -->
+                            <ContentPresenter x:Name="Glyph" Opacity="0"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
