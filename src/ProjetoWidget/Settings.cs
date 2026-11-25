@@ -1,23 +1,75 @@
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ProjetoWidget;
+
+public enum ClockStyle { Analog, Digital }
 
 /// <summary>User settings, stored in %AppData%\ProjetoWidget\settings.json.</summary>
 public sealed class Settings
 {
+    /// <summary>Raised when a widget option changes, so open widgets can update right away.</summary>
+    public static event Action? Changed;
+
+    private ClockStyle _clockStyle = ClockStyle.Analog;
+    private string _musicApp = "";
+
+    /// <summary>Music widget: the preferred app (Apple Music, YouTube Music or Spotify).</summary>
+    public string MusicApp
+    {
+        get => _musicApp;
+        set
+        {
+            if (_musicApp == value) return;
+            _musicApp = value;
+            Changed?.Invoke();
+        }
+    }
+
+    /// <summary>Clock widget: analog face with three hands, or digital numbers.</summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ClockStyle ClockStyle
+    {
+        get => _clockStyle;
+        set
+        {
+            if (_clockStyle == value) return;
+            _clockStyle = value;
+            Changed?.Invoke();
+        }
+    }
+
     private static readonly string FilePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "ProjetoWidget", "settings.json");
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
+    // Must come after FilePath: static fields are initialized in the order they are written.
+    /// <summary>The one settings object shared by the whole app.</summary>
+    public static Settings Current { get; } = Load();
+
     /// <summary>Which widgets are switched on, by widget id.</summary>
     public Dictionary<string, bool> Widgets { get; set; } = [];
+
+    /// <summary>Where each widget sits on the screen (left, top), by widget id.</summary>
+    public Dictionary<string, double[]> Positions { get; set; } = [];
 
     public bool IsOn(string id) => Widgets.TryGetValue(id, out var on) && on;
 
     public void SetOn(string id, bool on) => Widgets[id] = on;
+
+    public bool TryGetPosition(string id, out double left, out double top)
+    {
+        left = top = 0;
+        if (!Positions.TryGetValue(id, out var p) || p.Length != 2)
+            return false;
+        (left, top) = (p[0], p[1]);
+        return true;
+    }
+
+    public void SetPosition(string id, double left, double top) => Positions[id] = [left, top];
 
     public static Settings Load()
     {

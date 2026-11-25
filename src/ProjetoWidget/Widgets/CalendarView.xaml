@@ -1,0 +1,22 @@
+<UserControl x:Class="ProjetoWidget.Widgets.CalendarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FontFamily="{StaticResource UiFont}" Foreground="{StaticResource InkBrush}">
+    <DockPanel>
+        <!-- Today: weekday and the date in dd/mm/yyyy -->
+        <StackPanel DockPanel.Dock="Top" Margin="2,0,0,6">
+            <TextBlock x:Name="DayText" FontSize="13" FontWeight="Bold">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#FF5FA8" Offset="0" />
+                        <GradientStop Color="#FFB13D" Offset="1" />
+                    </LinearGradientBrush>
+                </TextBlock.Foreground>
+            </TextBlock>
+            <TextBlock x:Name="DateText" FontSize="22" FontWeight="Bold" Margin="0,-2,0,0" />
+        </StackPanel>
+
+        <!-- Month grid -->
+        <UniformGrid x:Name="MonthGrid" Columns="7" />
+    </DockPanel>
+</UserControl>
