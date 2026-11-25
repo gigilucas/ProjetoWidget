@@ -19,7 +19,9 @@ The app ships as a single `.exe` for PC.
 
 ## How it works
 
-The app opens a small manager window that lists the five widgets.
+The app lives in the **notification area** (the **^** arrow next to the clock on the taskbar), not on the taskbar like a normal app. **Click its icon** to open the menu; right-click it for *Open ProjetoWidget*, *Start with Windows* and *Quit*.
+
+The menu lists the five widgets.
 
 <p align="center">
   <img src="docs/screenshots/manager.png" alt="Manager window" width="31%">
@@ -29,12 +31,16 @@ The app opens a small manager window that lists the five widgets.
 
 - **On/off switch**: shows or hides that widget on the desktop.
 - **Click a row** (not the switch): opens that widget's settings. **‹ Widgets** goes back.
+- **Pinned to the desktop**: widgets live on the desktop like the wallpaper. They stay behind every other window, even when you click them, and they stay visible on *Show desktop* (Win+D). To reach them, show the desktop or move the windows out of the way.
 - **Drag a widget** anywhere on the screen; its position is remembered.
+- **Always whole on a screen**: a widget can't go past the screen edges or under the taskbar. With more than one monitor you can drag it from screen to screen; it jumps over when its center crosses, so it never sits half on each. If a monitor is unplugged or the resolution changes, widgets move back onto a screen.
 - **Widgets never cover each other**: they can touch, but if you drag one onto another it slides out the shortest way and stays edge to edge. A widget that opens where another one already is moves to the nearest free spot.
-- **Dark mode** (under *Appearance*): switches the menu and all the widgets to dark at once. See [Dark mode](#dark-mode).
+- **Dark mode** (under *App*): switches the menu and all the widgets to dark at once. See [Dark mode](#dark-mode).
+- **Start with Windows** (under *App*, on by default): when the PC starts, the widgets appear on the desktop and the icon goes to the notification area; the menu stays closed until you click the icon.
+- The red and yellow buttons tuck the menu away into the notification area; the widgets keep running. To close everything, right-click the icon and choose **Quit**.
+- Only one copy runs at a time: opening the app again just brings up its menu.
 - Widgets don't show up in the taskbar or in Alt+Tab.
-- Your choices are saved in `%AppData%\ProjetoWidget\settings.json`, and the widgets that were on come back the next time you open the app.
-- Closing the manager window (red button) closes the app and its widgets.
+- Your choices are saved in `%AppData%\ProjetoWidget\settings.json`, and the widgets that were on come back the next time the app starts.
 
 ## Widgets
 
@@ -82,7 +88,7 @@ The app opens a small manager window that lists the five widgets.
 
 ## Dark mode
 
-Turn on **Dark mode** in the menu, under *Appearance*. The menu and every widget on the desktop change right away, and the choice is saved.
+Turn on **Dark mode** in the menu, under *App*. The menu and every widget on the desktop change right away, and the choice is saved.
 
 The widgets become smoked dark glass with white text, and keep the logo colors in the clock hands, rings, today's date, the play button and the progress bar.
 
@@ -100,15 +106,11 @@ The widgets become smoked dark glass with white text, and keep the logo colors i
   <img src="docs/screenshots/dark/settings-weather.png" alt="Weather settings, dark" width="31%">
 </p>
 
-## Not done yet
-
-- **Pin the widgets to the wallpaper**: for now they are normal windows that stay where you put them but can sit on top of other windows. The plan is to attach them to Windows' `WorkerW`/`Progman` desktop layer so they stay behind everything and survive *Show desktop* (Win+D).
-- Start with Windows.
-
 ## Tech stack
 
 - **C# / .NET 10 / WPF**, targeting the Windows 10 SDK (for location and media controls). Published as one self-contained `.exe`.
 - Windows APIs: `Windows.Devices.Geolocation` (location), `GlobalSystemMediaTransportControlsSessionManager` (music), performance counters and `GlobalMemoryStatusEx` (CPU / RAM).
+- Pinning: each widget window is owned by the desktop window that holds the icons (`Progman`, or a `WorkerW` with a wallpaper slideshow), kept just above it in the z-order, and re-pinned if Explorer restarts. See [`DesktopPin.cs`](src/ProjetoWidget/DesktopPin.cs).
 
 ## Getting started
 
@@ -135,6 +137,7 @@ The app ends up in `publish/ProjetoWidget.exe`.
 | `--screenshot out.png` | Saves an image of the manager window and exits. |
 | `--screenshot out.png --page clock` | Same, showing that widget's settings. |
 | `--screenshot out.png --widget weather` | Saves an image of one widget instead. |
+| `--background` | Starts with only the widgets and the tray icon, no menu (used by *Start with Windows*). |
 | `--location 38.72,-9.14` | Uses these coordinates for the weather instead of the PC's location. |
 | `--music-test FakePlayer:Spotify` | Lets the Music widget follow a test media session whose id contains `FakePlayer`, labelled *Spotify*. |
 
@@ -146,6 +149,9 @@ The screenshots in this README were made with these options. [`tools/make-icon.p
 src/ProjetoWidget/
   MainWindow.xaml        Manager window: widget list, settings pages
   WidgetWindow.xaml      One widget on the desktop (glass card)
+  DesktopPin.cs          Keeps widgets pinned to the desktop
+  TrayIcon.cs            Icon in the notification area
+  StartupRegistration.cs Start with Windows
   Widgets/               Content and settings view of each widget
   Services/              Weather, music and CPU / RAM data
   Themes/                Light and dark colors (menu and widgets)
