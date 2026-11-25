@@ -7,24 +7,19 @@
         UseLayoutRounding="True">
 
     <!-- Empty glass card for now; the widget content comes later. Margin leaves room for the shadow. -->
-    <Grid Margin="16" MouseLeftButtonDown="Card_MouseLeftButtonDown" Cursor="SizeAll">
+    <Grid Margin="16" Cursor="SizeAll" Background="Transparent"
+          MouseLeftButtonDown="Card_MouseLeftButtonDown" MouseMove="Card_MouseMove"
+          MouseLeftButtonUp="Card_MouseLeftButtonUp" LostMouseCapture="Card_LostMouseCapture">
         <Grid.Effect>
             <DropShadowEffect BlurRadius="28" ShadowDepth="8" Direction="270" Opacity="0.28" Color="#3C2882" />
         </Grid.Effect>
 
         <!-- Frosted glass body -->
-        <Border CornerRadius="48" BorderBrush="#D9FFFFFF" BorderThickness="1.5">
-            <Border.Background>
-                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#A6FFFFFF" Offset="0" />
-                    <GradientStop Color="#59FFFFFF" Offset="0.55" />
-                    <GradientStop Color="#73FFFFFF" Offset="1" />
-                </LinearGradientBrush>
-            </Border.Background>
+        <Border CornerRadius="48" BorderBrush="{DynamicResource WidgetBorderBrush}" BorderThickness="1.5" Background="{DynamicResource WidgetBodyBrush}">
         </Border>
 
         <!-- Iridescent tint at the bottom, in the logo colors -->
-        <Border CornerRadius="48" IsHitTestVisible="False" Opacity="0.35">
+        <Border CornerRadius="48" IsHitTestVisible="False" Opacity="{DynamicResource WidgetTintOpacity}">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0.4" EndPoint="1,1">
                     <GradientStop Color="#004F7CFF" Offset="0" />
@@ -36,14 +31,7 @@
         </Border>
 
         <!-- Specular sheen, top-left like the logo -->
-        <Border CornerRadius="48" IsHitTestVisible="False">
-            <Border.Background>
-                <RadialGradientBrush Center="0.2,0.06" GradientOrigin="0.2,0.06" RadiusX="0.55" RadiusY="0.35">
-                    <GradientStop Color="#CCFFFFFF" Offset="0" />
-                    <GradientStop Color="#00FFFFFF" Offset="1" />
-                </RadialGradientBrush>
-            </Border.Background>
-        </Border>
+        <Border CornerRadius="48" IsHitTestVisible="False" Background="{DynamicResource WidgetSheenBrush}" />
 
         <!-- Widget content (clock, calendar, ...). Not hit-testable, so the whole card stays draggable. -->
         <ContentControl x:Name="Host" Margin="18" IsHitTestVisible="False" />

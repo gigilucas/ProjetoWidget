@@ -37,6 +37,7 @@ public partial class MainWindow : Window
         }
 
         WidgetList.ItemsSource = _widgets;
+        DarkModeToggle.IsChecked = _settings.DarkMode;
         UpdateSummary();
 
         // Dev aid: "ProjetoWidget.exe --screenshot out.png" saves an image of the window and exits.
@@ -109,9 +110,14 @@ public partial class MainWindow : Window
             return;
 
         var window = new WidgetWindow(widget) { WindowStartupLocation = WindowStartupLocation.Manual };
-        (window.Left, window.Top) = _settings.TryGetPosition(widget.Id, out var left, out var top)
-            ? (left, top)
+        var (left, top) = _settings.TryGetPosition(widget.Id, out var savedLeft, out var savedTop)
+            ? (savedLeft, savedTop)
             : DefaultPosition(_widgets.IndexOf(widget), window.Width, window.Height);
+
+        // Widgets may touch but never cover each other.
+        var others = () => _openWidgets.Values.Where(w => w != window).Select(w => w.Card);
+        (window.Left, window.Top) = FreeSpot(left, top, window.Width, window.Height, others().ToList());
+        window.Obstacles = others;
 
         window.Moved += (_, _) =>
         {
@@ -134,6 +140,24 @@ public partial class MainWindow : Window
     {
         if (_openWidgets.Remove(widget.Id, out var window))
             window.Close();
+    }
+
+    /// <summary>
+    /// The spot closest to (left, top) where a widget doesn't cover any other one:
+    /// first by sliding it out, otherwise the first free place in a grid over the screen.
+    /// </summary>
+    private static (double Left, double Top) FreeSpot(double left, double top, double width, double height, IReadOnlyList<Rect> others)
+    {
+        var card = WidgetWindow.CardAt(left, top, width, height);
+        if (WidgetWindow.Resolve(card, others) is { } free)
+            return (free.Left - WidgetWindow.ShadowMargin, free.Top - WidgetWindow.ShadowMargin);
+
+        var area = SystemParameters.WorkArea;
+        for (var y = area.Top; y + height <= area.Bottom; y += card.Height)
+            for (var x = area.Right - width; x >= area.Left; x -= card.Width)
+                if (!others.Any(o => WidgetWindow.Overlaps(WidgetWindow.CardAt(x, y, width, height), o)))
+                    return (x, y);
+        return (left, top);
     }
 
     /// <summary>First launch: line the widgets up in a grid at the top-right of the screen.</summary>
@@ -226,13 +250,24 @@ public partial class MainWindow : Window
             "cpu-ram" => new Widgets.CpuRamSettingsView(),
             "weather" => new Widgets.WeatherSettingsView(),
             "music" => new Widgets.MusicSettingsView(),
-            _ => new System.Windows.Controls.TextBlock
-            {
-                Text = "Nothing to set yet.",
-                FontSize = 15,
-                Foreground = (Brush)FindResource("InkSoftBrush"),
-            },
+            _ => NothingToSet(),
         };
+    }
+
+    private static System.Windows.Controls.TextBlock NothingToSet()
+    {
+        var text = new System.Windows.Controls.TextBlock { Text = "Nothing to set yet.", FontSize = 15 };
+        text.SetResourceReference(System.Windows.Controls.TextBlock.ForegroundProperty, "MenuInkSoft");
+        return text;
+    }
+
+    private void DarkMode_Changed(object sender, RoutedEventArgs e)
+    {
+        var dark = DarkModeToggle.IsChecked == true;
+        if (_settings.DarkMode == dark) return;
+        _settings.DarkMode = dark;
+        _settings.Save();
+        App.ApplyTheme(dark);
     }
 
     private void Back_Click(object sender, RoutedEventArgs e) =>

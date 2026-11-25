@@ -1,28 +1,28 @@
 <UserControl x:Class="ProjetoWidget.Widgets.CpuRamSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             FontFamily="{StaticResource UiFont}" Foreground="{StaticResource InkBrush}">
+             FontFamily="{StaticResource UiFont}" Foreground="{DynamicResource MenuInk}">
     <StackPanel>
         <Grid>
             <TextBlock Text="Processor" FontSize="15" FontWeight="SemiBold" />
-            <TextBlock x:Name="CoresText" FontSize="15" Foreground="{StaticResource InkSoftBrush}" HorizontalAlignment="Right" />
+            <TextBlock x:Name="CoresText" FontSize="15" Foreground="{DynamicResource MenuInkSoft}" HorizontalAlignment="Right" />
         </Grid>
-        <TextBlock x:Name="CpuNameText" FontSize="12.5" Foreground="{StaticResource InkSoftBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+        <TextBlock x:Name="CpuNameText" FontSize="12.5" Foreground="{DynamicResource MenuInkSoft}" TextWrapping="Wrap" Margin="0,4,0,0" />
 
         <Border Style="{StaticResource SettingsDivider}" />
 
         <Grid>
             <TextBlock Text="Memory" FontSize="15" FontWeight="SemiBold" />
-            <TextBlock x:Name="MemoryText" FontSize="15" Foreground="{StaticResource InkSoftBrush}" HorizontalAlignment="Right" />
+            <TextBlock x:Name="MemoryText" FontSize="15" Foreground="{DynamicResource MenuInkSoft}" HorizontalAlignment="Right" />
         </Grid>
 
         <Border Style="{StaticResource SettingsDivider}" />
 
         <Grid>
             <TextBlock Text="Updates" FontSize="15" FontWeight="SemiBold" />
-            <TextBlock Text="Every second" FontSize="15" Foreground="{StaticResource InkSoftBrush}" HorizontalAlignment="Right" />
+            <TextBlock Text="Every second" FontSize="15" Foreground="{DynamicResource MenuInkSoft}" HorizontalAlignment="Right" />
         </Grid>
         <TextBlock Text="Shows CPU speed, as Windows doesn't share the CPU temperature."
-                   FontSize="12.5" Foreground="{StaticResource InkSoftBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                   FontSize="12.5" Foreground="{DynamicResource MenuInkSoft}" TextWrapping="Wrap" Margin="0,4,0,0" />
     </StackPanel>
 </UserControl>

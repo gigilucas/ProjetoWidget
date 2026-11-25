@@ -1,0 +1,64 @@
+<!-- Menu (manager window) colors, light mode. Keys must match Dark.xaml. -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+    <SolidColorBrush x:Key="MenuInk" Color="#1C1B2E" />
+    <SolidColorBrush x:Key="MenuInkSoft" Color="#8C1C1B2E" />
+
+    <LinearGradientBrush x:Key="MenuBaseBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#DFE6FF" Offset="0" />
+        <GradientStop Color="#F3E6F7" Offset="0.55" />
+        <GradientStop Color="#FDEEE2" Offset="1" />
+    </LinearGradientBrush>
+    <sys:Double x:Key="MenuBlobOpacity">1</sys:Double>
+    <SolidColorBrush x:Key="MenuGlassBrush" Color="#4DFFFFFF" />
+    <RadialGradientBrush x:Key="MenuSheenBrush" Center="0.18,0.04" GradientOrigin="0.18,0.04" RadiusX="0.45" RadiusY="0.25">
+        <GradientStop Color="#D9FFFFFF" Offset="0" />
+        <GradientStop Color="#00FFFFFF" Offset="1" />
+    </RadialGradientBrush>
+    <SolidColorBrush x:Key="MenuRimBrush" Color="#CCFFFFFF" />
+
+    <SolidColorBrush x:Key="MenuCardBrush" Color="#66FFFFFF" />
+    <SolidColorBrush x:Key="MenuCardHoverBrush" Color="#99FFFFFF" />
+    <SolidColorBrush x:Key="MenuCardBorderBrush" Color="#BFFFFFFF" />
+    <SolidColorBrush x:Key="MenuCardBorderHoverBrush" Color="#F2FFFFFF" />
+    <SolidColorBrush x:Key="MenuPanelBrush" Color="#40FFFFFF" />
+    <SolidColorBrush x:Key="MenuPillBrush" Color="#59FFFFFF" />
+    <SolidColorBrush x:Key="MenuPillHoverBrush" Color="#99FFFFFF" />
+    <SolidColorBrush x:Key="MenuRowHoverBrush" Color="#4DFFFFFF" />
+    <SolidColorBrush x:Key="MenuRowSelectedBrush" Color="#80FFFFFF" />
+    <SolidColorBrush x:Key="MenuDividerBrush" Color="#99FFFFFF" />
+    <SolidColorBrush x:Key="MenuToggleOffBrush" Color="#2E1C1B2E" />
+    <SolidColorBrush x:Key="MenuToggleOffBorderBrush" Color="#80FFFFFF" />
+
+    <!-- ===== Widgets on the desktop ===== -->
+    <SolidColorBrush x:Key="InkBrush" Color="#1C1B2E" />
+    <SolidColorBrush x:Key="InkSoftBrush" Color="#8C1C1B2E" />
+
+    <LinearGradientBrush x:Key="WidgetBodyBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#A6FFFFFF" Offset="0" />
+        <GradientStop Color="#59FFFFFF" Offset="0.55" />
+        <GradientStop Color="#73FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="WidgetBorderBrush" Color="#D9FFFFFF" />
+    <sys:Double x:Key="WidgetTintOpacity">0.35</sys:Double>
+    <RadialGradientBrush x:Key="WidgetSheenBrush" Center="0.2,0.06" GradientOrigin="0.2,0.06" RadiusX="0.55" RadiusY="0.35">
+        <GradientStop Color="#CCFFFFFF" Offset="0" />
+        <GradientStop Color="#00FFFFFF" Offset="1" />
+    </RadialGradientBrush>
+
+    <RadialGradientBrush x:Key="WidgetFaceBrush" Center="0.35,0.3" GradientOrigin="0.35,0.3" RadiusX="0.8" RadiusY="0.8">
+        <GradientStop Color="#E6FFFFFF" Offset="0" />
+        <GradientStop Color="#59FFFFFF" Offset="1" />
+    </RadialGradientBrush>
+    <SolidColorBrush x:Key="WidgetFaceStrokeBrush" Color="#F2FFFFFF" />
+    <SolidColorBrush x:Key="WidgetMinorTickBrush" Color="#591C1B2E" />
+    <SolidColorBrush x:Key="WidgetTrackBrush" Color="#99FFFFFF" />
+    <SolidColorBrush x:Key="WidgetDividerBrush" Color="#B3FFFFFF" />
+    <SolidColorBrush x:Key="WidgetChipBrush" Color="#73FFFFFF" />
+    <SolidColorBrush x:Key="WidgetChipBorderBrush" Color="#E6FFFFFF" />
+    <SolidColorBrush x:Key="WidgetHoverBrush" Color="#4DFFFFFF" />
+    <SolidColorBrush x:Key="WidgetPillBrush" Color="#80FFFFFF" />
+    <SolidColorBrush x:Key="WidgetPillHoverBrush" Color="#CCFFFFFF" />
+</ResourceDictionary>

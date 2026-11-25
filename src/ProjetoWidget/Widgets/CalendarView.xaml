@@ -1,7 +1,7 @@
 <UserControl x:Class="ProjetoWidget.Widgets.CalendarView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             FontFamily="{StaticResource UiFont}" Foreground="{StaticResource InkBrush}">
+             FontFamily="{StaticResource UiFont}" Foreground="{DynamicResource InkBrush}">
     <DockPanel>
         <!-- Today: weekday and the date in dd/mm/yyyy -->
         <StackPanel DockPanel.Dock="Top" Margin="2,0,0,6">

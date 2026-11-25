@@ -34,8 +34,9 @@ public partial class CalendarView : UserControl
 
         MonthGrid.Children.Clear();
         var firstDayOfWeek = CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek;
-        var soft = (Brush)FindResource("InkSoftBrush");
-        var ink = (Brush)FindResource("InkBrush");
+        // Brush keys, so the text follows light/dark mode
+        const string soft = "InkSoftBrush";
+        const string ink = "InkBrush";
 
         // Weekday letters
         for (var i = 0; i < 7; i++)
@@ -66,15 +67,22 @@ public partial class CalendarView : UserControl
             MonthGrid.Children.Add(new Border());
     }
 
-    private static TextBlock Cell(string text, Brush brush, bool bold) => new()
+    /// <param name="brushKey">Theme brush for the text, or null to keep it white.</param>
+    private static TextBlock Cell(string text, string? brushKey, bool bold)
     {
-        Text = text,
-        Foreground = brush,
-        FontSize = 12,
-        FontWeight = bold ? FontWeights.Bold : FontWeights.SemiBold,
-        HorizontalAlignment = HorizontalAlignment.Center,
-        VerticalAlignment = VerticalAlignment.Center,
-    };
+        var cell = new TextBlock
+        {
+            Text = text,
+            Foreground = Brushes.White,
+            FontSize = 12,
+            FontWeight = bold ? FontWeights.Bold : FontWeights.SemiBold,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        if (brushKey is not null)
+            cell.SetResourceReference(TextBlock.ForegroundProperty, brushKey);
+        return cell;
+    }
 
     private Grid TodayCell(int day)
     {
@@ -86,7 +94,7 @@ public partial class CalendarView : UserControl
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
         });
-        cell.Children.Add(Cell(day.ToString(CultureInfo.InvariantCulture), Brushes.White, bold: true));
+        cell.Children.Add(Cell(day.ToString(CultureInfo.InvariantCulture), null, bold: true));
         return cell;
     }
 }

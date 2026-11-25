@@ -2,20 +2,20 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:ProjetoWidget.Widgets"
-             FontFamily="{StaticResource UiFont}" Foreground="{StaticResource InkBrush}">
+             FontFamily="{StaticResource UiFont}" Foreground="{DynamicResource InkBrush}">
     <Grid>
         <!-- Forecast -->
         <DockPanel x:Name="ForecastView" Visibility="Collapsed">
             <!-- Daily: today + next 4 days, high and low -->
             <StackPanel DockPanel.Dock="Bottom">
-                <Border Height="1" Background="#B3FFFFFF" Margin="0,0,0,5" />
+                <Border Height="1" Background="{DynamicResource WidgetDividerBrush}" Margin="0,0,0,5" />
                 <UniformGrid x:Name="Days" Columns="5" />
             </StackPanel>
 
             <!-- Condition, high/low -->
             <StackPanel DockPanel.Dock="Bottom" Margin="2,0,0,7">
                 <TextBlock x:Name="ConditionText" FontSize="13.5" FontWeight="SemiBold" />
-                <TextBlock x:Name="HighLowText" FontSize="11.5" Foreground="{StaticResource InkSoftBrush}" />
+                <TextBlock x:Name="HighLowText" FontSize="11.5" Foreground="{DynamicResource InkSoftBrush}" />
             </StackPanel>
 
             <!-- Place, temperature and icon -->
@@ -25,7 +25,7 @@
                 <StackPanel Margin="2,0,0,0">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock x:Name="PlaceText" FontSize="15" FontWeight="Bold" MaxWidth="100" TextTrimming="CharacterEllipsis" />
-                        <Path Data="M10.5,0 L0,4.2 L4.6,5.8 L6.2,10.5 Z" Fill="{StaticResource InkBrush}"
+                        <Path Data="M10.5,0 L0,4.2 L4.6,5.8 L6.2,10.5 Z" Fill="{DynamicResource InkBrush}"
                               Margin="5,0,0,0" VerticalAlignment="Center" />
                     </StackPanel>
                     <TextBlock x:Name="TempText" FontSize="50" FontWeight="Light" Margin="-2,-4,0,0" />
@@ -38,7 +38,7 @@
             <local:WeatherIcon Kind="PartlyCloudyDay" Width="78" Height="62" Opacity="0.85" />
             <TextBlock x:Name="MessageTitle" Text="Getting weather…" FontSize="14" FontWeight="Bold"
                        HorizontalAlignment="Center" Margin="0,8,0,0" />
-            <TextBlock x:Name="MessageText" FontSize="11.5" Foreground="{StaticResource InkSoftBrush}"
+            <TextBlock x:Name="MessageText" FontSize="11.5" Foreground="{DynamicResource InkSoftBrush}"
                        HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="170" Margin="0,2,0,0" />
         </StackPanel>
     </Grid>

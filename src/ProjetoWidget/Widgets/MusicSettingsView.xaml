@@ -1,13 +1,14 @@
 <UserControl x:Class="ProjetoWidget.Widgets.MusicSettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             FontFamily="{StaticResource UiFont}" Foreground="{StaticResource InkBrush}">
+             FontFamily="{StaticResource UiFont}" Foreground="{DynamicResource MenuInk}">
     <UserControl.Resources>
         <!-- One selectable music app row -->
         <Style x:Key="AppOption" TargetType="RadioButton">
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="GroupName" Value="MusicApp" />
+            <Setter Property="Foreground" Value="{DynamicResource MenuInk}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
@@ -24,7 +25,7 @@
                                 </Border>
                                 <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding Name}" FontSize="14.5" FontWeight="SemiBold" />
-                                    <TextBlock Text="{Binding Status}" FontSize="11.5" Foreground="{StaticResource InkSoftBrush}" />
+                                    <TextBlock Text="{Binding Status}" FontSize="11.5" Foreground="{DynamicResource MenuInkSoft}" />
                                 </StackPanel>
                                 <!-- check mark -->
                                 <Grid x:Name="Check" Grid.Column="2" Width="22" Height="22" Visibility="Hidden">
@@ -36,10 +37,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Row" Property="Background" Value="#4DFFFFFF" />
+                                <Setter TargetName="Row" Property="Background" Value="{DynamicResource MenuRowHoverBrush}" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Row" Property="Background" Value="#80FFFFFF" />
+                                <Setter TargetName="Row" Property="Background" Value="{DynamicResource MenuRowSelectedBrush}" />
                                 <Setter TargetName="Check" Property="Visibility" Value="Visible" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -52,7 +53,7 @@
     <StackPanel>
         <TextBlock Text="Music app" FontSize="15" FontWeight="SemiBold" />
         <TextBlock Text="When you open one of these apps and play, it shows up on the widget by itself."
-                   FontSize="12.5" Foreground="{StaticResource InkSoftBrush}" TextWrapping="Wrap" Margin="0,2,0,8" />
+                   FontSize="12.5" Foreground="{DynamicResource MenuInkSoft}" TextWrapping="Wrap" Margin="0,2,0,8" />
         <ScrollViewer MaxHeight="236" VerticalScrollBarVisibility="Auto" Margin="-6,0,-10,0">
             <ItemsControl x:Name="AppList">
                 <ItemsControl.ItemTemplate>

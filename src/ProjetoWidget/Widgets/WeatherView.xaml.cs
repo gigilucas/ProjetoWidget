@@ -46,25 +46,27 @@ public partial class WeatherView : UserControl
         ConditionText.Text = WeatherCodes.Describe(r.Code);
         HighLowText.Text = $"H:{Math.Round(r.High):0}°  L:{Math.Round(r.Low):0}°";
 
-        var soft = (System.Windows.Media.Brush)FindResource("InkSoftBrush");
         Days.Children.Clear();
         foreach (var d in r.Days)
         {
             var cell = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center };
-            cell.Children.Add(new TextBlock
+            var label = new TextBlock { Text = d.Label, FontSize = 10.5, HorizontalAlignment = HorizontalAlignment.Center };
+            var low = new TextBlock
             {
-                Text = d.Label, FontSize = 10.5, Foreground = soft, HorizontalAlignment = HorizontalAlignment.Center,
-            });
+                Text = $"{Math.Round(d.Low):0}°", FontSize = 10.5,
+                HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, -2, 0, 0),
+            };
+            // Soft text that follows light/dark mode
+            label.SetResourceReference(TextBlock.ForegroundProperty, "InkSoftBrush");
+            low.SetResourceReference(TextBlock.ForegroundProperty, "InkSoftBrush");
+
+            cell.Children.Add(label);
             cell.Children.Add(new TextBlock
             {
                 Text = $"{Math.Round(d.High):0}°", FontSize = 12.5, FontWeight = FontWeights.SemiBold,
                 HorizontalAlignment = HorizontalAlignment.Center,
             });
-            cell.Children.Add(new TextBlock
-            {
-                Text = $"{Math.Round(d.Low):0}°", FontSize = 10.5, Foreground = soft,
-                HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, -2, 0, 0),
-            });
+            cell.Children.Add(low);
             Days.Children.Add(cell);
         }
 

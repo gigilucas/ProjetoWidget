@@ -66,12 +66,13 @@ public partial class ClockView : UserControl
             {
                 X1 = 100, X2 = 100,
                 Y1 = major ? 9 : 8, Y2 = major ? 19 : 13,
-                Stroke = major ? (Brush)FindResource("InkBrush") : new SolidColorBrush(Color.FromArgb(0x59, 0x1C, 0x1B, 0x2E)),
                 StrokeThickness = major ? 3 : 1.5,
                 StrokeStartLineCap = PenLineCap.Round,
                 StrokeEndLineCap = PenLineCap.Round,
                 RenderTransform = new RotateTransform(i * 6, 100, 100),
             };
+            // Follows light/dark mode
+            tick.SetResourceReference(Shape.StrokeProperty, major ? "InkBrush" : "WidgetMinorTickBrush");
             Ticks.Children.Add(tick);
         }
     }

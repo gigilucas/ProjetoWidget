@@ -15,6 +15,9 @@ public sealed class Settings
     private ClockStyle _clockStyle = ClockStyle.Analog;
     private string _musicApp = "";
 
+    /// <summary>Menu and widgets in dark mode.</summary>
+    public bool DarkMode { get; set; }
+
     /// <summary>Music widget: the preferred app (Apple Music, YouTube Music or Spotify).</summary>
     public string MusicApp
     {

@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="ProjetoWidget"
         Icon="Assets/app.ico"
-        Width="440" Height="690"
+        Width="440" Height="760"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
-        FontFamily="{StaticResource UiFont}" Foreground="{StaticResource InkBrush}"
+        FontFamily="{StaticResource UiFont}" Foreground="{DynamicResource MenuInk}"
         UseLayoutRounding="True">
 
     <!-- Outer margin leaves room for the drop shadow -->
@@ -18,18 +18,10 @@
         <Grid x:Name="Shell" SizeChanged="Shell_SizeChanged">
 
             <!-- 1. Soft base gradient -->
-            <Rectangle>
-                <Rectangle.Fill>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#DFE6FF" Offset="0" />
-                        <GradientStop Color="#F3E6F7" Offset="0.55" />
-                        <GradientStop Color="#FDEEE2" Offset="1" />
-                    </LinearGradientBrush>
-                </Rectangle.Fill>
-            </Rectangle>
+            <Rectangle Fill="{DynamicResource MenuBaseBrush}" />
 
             <!-- 2. Blurred color blobs, same palette as the logo -->
-            <Canvas IsHitTestVisible="False">
+            <Canvas IsHitTestVisible="False" Opacity="{DynamicResource MenuBlobOpacity}">
                 <Canvas.Effect>
                     <BlurEffect Radius="80" KernelType="Gaussian" RenderingBias="Performance" />
                 </Canvas.Effect>
@@ -40,15 +32,8 @@
             </Canvas>
 
             <!-- 3. Frosted glass layer + specular sheen -->
-            <Rectangle Fill="#4DFFFFFF" IsHitTestVisible="False" />
-            <Rectangle IsHitTestVisible="False">
-                <Rectangle.Fill>
-                    <RadialGradientBrush Center="0.18,0.04" GradientOrigin="0.18,0.04" RadiusX="0.45" RadiusY="0.25">
-                        <GradientStop Color="#D9FFFFFF" Offset="0" />
-                        <GradientStop Color="#00FFFFFF" Offset="1" />
-                    </RadialGradientBrush>
-                </Rectangle.Fill>
-            </Rectangle>
+            <Rectangle Fill="{DynamicResource MenuGlassBrush}" IsHitTestVisible="False" />
+            <Rectangle Fill="{DynamicResource MenuSheenBrush}" IsHitTestVisible="False" />
 
             <!-- 4. Content -->
             <DockPanel Margin="26,20,26,24">
@@ -78,7 +63,7 @@
                     </Image>
                     <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
                         <TextBlock Text="ProjetoWidget" FontSize="26" FontWeight="Bold" />
-                        <TextBlock Text="Desktop widgets" FontSize="15" Foreground="{StaticResource InkSoftBrush}" Margin="1,2,0,0" />
+                        <TextBlock Text="Desktop widgets" FontSize="15" Foreground="{DynamicResource MenuInkSoft}" Margin="1,2,0,0" />
                     </StackPanel>
                 </StackPanel>
 
@@ -91,7 +76,40 @@
 
                 <!-- Footer -->
                 <TextBlock x:Name="Summary" DockPanel.Dock="Bottom" HorizontalAlignment="Center" Margin="0,8,0,0"
-                           FontSize="13" Foreground="{StaticResource InkSoftBrush}" />
+                           FontSize="13" Foreground="{DynamicResource MenuInkSoft}" />
+
+                <!-- Appearance: dark mode for this menu -->
+                <StackPanel DockPanel.Dock="Bottom">
+                    <TextBlock Text="APPEARANCE" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource MenuInkSoft}" Margin="6,6,0,8" />
+                    <Border CornerRadius="22" Background="{DynamicResource MenuCardBrush}" BorderBrush="{DynamicResource MenuCardBorderBrush}"
+                            BorderThickness="1" Padding="14,12,16,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="40" Height="40" CornerRadius="12">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#2B2D5C" Offset="0" />
+                                        <GradientStop Color="#8B5CFF" Offset="1" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.22" Color="#3C2882" />
+                                </Border.Effect>
+                                <TextBlock Text="&#xE708;" FontFamily="{StaticResource IconFont}" FontSize="18"
+                                           Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Grid.Column="1" Text="Dark mode" FontSize="18" FontWeight="SemiBold"
+                                       VerticalAlignment="Center" Margin="14,0,0,0" />
+                            <CheckBox x:Name="DarkModeToggle" Grid.Column="2" Style="{StaticResource AppleToggle}" VerticalAlignment="Center"
+                                      AutomationProperties.Name="Dark mode" ToolTip="Dark mode for the menu and the widgets"
+                                      Checked="DarkMode_Changed" Unchecked="DarkMode_Changed" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
 
                 <!-- Widget list: click a row to open its settings, click the switch to show/hide it -->
                 <ItemsControl x:Name="WidgetList">
@@ -102,13 +120,13 @@
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Setter Property="CornerRadius" Value="22" />
-                                        <Setter Property="Background" Value="#66FFFFFF" />
-                                        <Setter Property="BorderBrush" Value="#BFFFFFFF" />
+                                        <Setter Property="Background" Value="{DynamicResource MenuCardBrush}" />
+                                        <Setter Property="BorderBrush" Value="{DynamicResource MenuCardBorderBrush}" />
                                         <Setter Property="BorderThickness" Value="1" />
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="#99FFFFFF" />
-                                                <Setter Property="BorderBrush" Value="#F2FFFFFF" />
+                                                <Setter Property="Background" Value="{DynamicResource MenuCardHoverBrush}" />
+                                                <Setter Property="BorderBrush" Value="{DynamicResource MenuCardBorderHoverBrush}" />
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
@@ -150,18 +168,19 @@
                             FocusVisualStyle="{x:Null}" ToolTip="Back to all widgets">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
-                                <Border x:Name="Pill" CornerRadius="15" Background="#59FFFFFF" BorderBrush="#BFFFFFFF"
+                                <Border x:Name="Pill" CornerRadius="15" Background="{DynamicResource MenuPillBrush}" BorderBrush="{DynamicResource MenuCardBorderBrush}"
                                         BorderThickness="1" Padding="10,5,14,5">
                                     <StackPanel Orientation="Horizontal">
-                                        <Path Width="10" Height="14" Stretch="None" Data="M7,2 L2,7 L7,12" Stroke="{StaticResource InkBrush}"
+                                        <Path Width="10" Height="14" Stretch="None" Data="M7,2 L2,7 L7,12" Stroke="{DynamicResource MenuInk}"
                                               StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
                                               VerticalAlignment="Center" />
-                                        <TextBlock Text="Widgets" FontSize="14" FontWeight="SemiBold" Margin="6,0,0,0" VerticalAlignment="Center" />
+                                        <TextBlock Text="Widgets" FontSize="14" FontWeight="SemiBold" Margin="6,0,0,0" VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource MenuInk}" />
                                     </StackPanel>
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Pill" Property="Background" Value="#99FFFFFF" />
+                                        <Setter TargetName="Pill" Property="Background" Value="{DynamicResource MenuPillHoverBrush}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -181,7 +200,7 @@
                     </StackPanel>
 
                     <!-- Show on desktop -->
-                    <Border DockPanel.Dock="Top" CornerRadius="22" Background="#66FFFFFF" BorderBrush="#BFFFFFFF" BorderThickness="1"
+                    <Border DockPanel.Dock="Top" CornerRadius="22" Background="{DynamicResource MenuCardBrush}" BorderBrush="{DynamicResource MenuCardBorderBrush}" BorderThickness="1"
                             Padding="18,14,16,14" Margin="0,0,0,12">
                         <Grid>
                             <TextBlock Text="Show on desktop" FontSize="17" FontWeight="SemiBold" VerticalAlignment="Center" />
@@ -191,10 +210,10 @@
                     </Border>
 
                     <!-- Settings area: one set of options per widget -->
-                    <Border CornerRadius="22" Background="#40FFFFFF" BorderBrush="#BFFFFFFF" BorderThickness="1" Padding="18,14"
+                    <Border CornerRadius="22" Background="{DynamicResource MenuPanelBrush}" BorderBrush="{DynamicResource MenuCardBorderBrush}" BorderThickness="1" Padding="18,14"
                             VerticalAlignment="Top">
                         <StackPanel>
-                            <TextBlock Text="SETTINGS" FontSize="13" FontWeight="Bold" Foreground="{StaticResource InkSoftBrush}" Margin="0,0,0,12" />
+                            <TextBlock Text="SETTINGS" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource MenuInkSoft}" Margin="0,0,0,12" />
                             <ContentControl x:Name="SettingsHost" />
                         </StackPanel>
                     </Border>
@@ -203,7 +222,7 @@
             </DockPanel>
 
             <!-- 5. Glass rim -->
-            <Border x:Name="Rim" CornerRadius="34" BorderBrush="#CCFFFFFF" BorderThickness="1.5" IsHitTestVisible="False" />
+            <Border x:Name="Rim" CornerRadius="34" BorderBrush="{DynamicResource MenuRimBrush}" BorderThickness="1.5" IsHitTestVisible="False" />
         </Grid>
     </Grid>
 </Window>

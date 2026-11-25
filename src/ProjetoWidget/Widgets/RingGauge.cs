@@ -19,11 +19,8 @@ public sealed class RingGauge : Grid
 
     public RingGauge(Color from, Color to)
     {
-        var track = new Ellipse
-        {
-            Stroke = new SolidColorBrush(Color.FromArgb(0x99, 0xFF, 0xFF, 0xFF)),
-            StrokeThickness = Thickness,
-        };
+        var track = new Ellipse { StrokeThickness = Thickness };
+        track.SetResourceReference(Shape.StrokeProperty, "WidgetTrackBrush"); // follows light/dark mode
         _arc = new Path
         {
             Stroke = new LinearGradientBrush(from, to, new Point(0, 0), new Point(1, 1)),
