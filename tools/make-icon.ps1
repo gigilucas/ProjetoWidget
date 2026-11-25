@@ -3,7 +3,7 @@ Add-Type -AssemblyName System.Drawing
 
 $root   = Split-Path $PSScriptRoot -Parent
 $source = Join-Path $root 'docs\logo.png'
-$assets = Join-Path $root 'src\ProjetoWidget\Assets'
+$assets = Join-Path $root 'src\Widglass\Assets'
 New-Item -ItemType Directory -Force $assets | Out-Null
 
 function Resize-Logo([System.Drawing.Image]$img, [int]$size) {
