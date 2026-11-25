@@ -38,6 +38,7 @@ public partial class MainWindow : Window
 
         WidgetList.ItemsSource = _widgets;
         DarkModeToggle.IsChecked = _settings.DarkMode;
+        StartWithWindowsToggle.IsChecked = _settings.StartWithWindows;
         UpdateSummary();
 
         // Dev aid: "ProjetoWidget.exe --screenshot out.png" saves an image of the window and exits.
@@ -87,21 +88,55 @@ public partial class MainWindow : Window
                 await Task.Delay(widgetToCapture is null ? 600 : 10000);
                 SaveScreenshot(target, args[i + 1]);
                 widgetWindow?.Close();
-                Close();
-            };
-        else
-            Loaded += (_, _) =>
-            {
-                foreach (var widget in _widgets.Where(w => w.IsOn))
-                    ShowWidget(widget);
+                Quit();
             };
 
-        // Closing the manager closes the whole app, widgets included.
-        Closed += (_, _) =>
+        // Keep widgets whole on screen when monitors change.
+        EventHandler onDisplayChanged = (_, _) => Dispatcher.BeginInvoke(RefitWidgets);
+        Microsoft.Win32.SystemEvents.DisplaySettingsChanged += onDisplayChanged;
+
+        // The menu only hides (the app keeps running in the tray); Quit really closes it.
+        Closing += (_, e) =>
         {
-            _shuttingDown = true; // keep the switches as they are, so the widgets come back next time
-            Application.Current.Shutdown();
+            if (_quitting) return;
+            e.Cancel = true;
+            Hide();
         };
+        Closed += (_, _) => Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= onDisplayChanged;
+    }
+
+    private bool _quitting;
+
+    public bool ScreenshotMode => _screenshotMode;
+
+    /// <summary>Opens the widgets that are switched on (called once at startup, even if the menu stays hidden).</summary>
+    public void StartWidgets()
+    {
+        foreach (var widget in _widgets.Where(w => w.IsOn))
+            ShowWidget(widget);
+    }
+
+    /// <summary>Shows the menu and brings it to the front (from the tray icon or a second launch).</summary>
+    public void ShowMenu()
+    {
+        Show();
+        if (WindowState == WindowState.Minimized)
+            WindowState = WindowState.Normal;
+        Activate();
+        Topmost = true;  // make sure it comes in front of other apps,
+        Topmost = false; // without staying on top
+        Focus();
+    }
+
+    /// <summary>Closes the widgets, the menu and the app. The switches stay as they are for next time.</summary>
+    public void Quit()
+    {
+        _quitting = true;
+        _shuttingDown = true;
+        foreach (var window in _openWidgets.Values.ToList())
+            window.Close();
+        Close();
+        Application.Current.Shutdown();
     }
 
     private void ShowWidget(WidgetOption widget)
@@ -146,18 +181,37 @@ public partial class MainWindow : Window
     /// The spot closest to (left, top) where a widget doesn't cover any other one:
     /// first by sliding it out, otherwise the first free place in a grid over the screen.
     /// </summary>
-    private static (double Left, double Top) FreeSpot(double left, double top, double width, double height, IReadOnlyList<Rect> others)
+    private (double Left, double Top) FreeSpot(double left, double top, double width, double height, IReadOnlyList<Rect> others)
     {
+        // Whole card inside the screen it's on (or the nearest one, e.g. if a monitor was unplugged)
+        var scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         var card = WidgetWindow.CardAt(left, top, width, height);
-        if (WidgetWindow.Resolve(card, others) is { } free)
+        var screen = WidgetWindow.ScreenAreaAt(WidgetWindow.Center(card), scale);
+        card = WidgetWindow.ClampInto(card, screen);
+        if (WidgetWindow.Resolve(card, others, screen) is { } free)
             return (free.Left - WidgetWindow.ShadowMargin, free.Top - WidgetWindow.ShadowMargin);
 
-        var area = SystemParameters.WorkArea;
-        for (var y = area.Top; y + height <= area.Bottom; y += card.Height)
-            for (var x = area.Right - width; x >= area.Left; x -= card.Width)
-                if (!others.Any(o => WidgetWindow.Overlaps(WidgetWindow.CardAt(x, y, width, height), o)))
-                    return (x, y);
-        return (left, top);
+        // No room there: first free place in a grid over that screen, from the top-right
+        for (var y = screen.Top; y + card.Height <= screen.Bottom; y += card.Height)
+            for (var x = screen.Right - card.Width; x >= screen.Left; x -= card.Width)
+            {
+                var spot = new Rect(x, y, card.Width, card.Height);
+                if (!others.Any(o => WidgetWindow.Overlaps(spot, o)))
+                    return (x - WidgetWindow.ShadowMargin, y - WidgetWindow.ShadowMargin);
+            }
+        return (card.Left - WidgetWindow.ShadowMargin, card.Top - WidgetWindow.ShadowMargin);
+    }
+
+    /// <summary>Screens changed (resolution, monitor added or removed): put every widget back fully on a screen.</summary>
+    private void RefitWidgets()
+    {
+        foreach (var window in _openWidgets.Values.ToList())
+        {
+            var others = _openWidgets.Values.Where(w => w != window).Select(w => w.Card).ToList();
+            (window.Left, window.Top) = FreeSpot(window.Left, window.Top, window.Width, window.Height, others);
+            _settings.SetPosition(window.Widget.Id, window.Left, window.Top);
+        }
+        _settings.Save();
     }
 
     /// <summary>First launch: line the widgets up in a grid at the top-right of the screen.</summary>
@@ -295,7 +349,25 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Close_Click(object sender, RoutedEventArgs e) => Close();
+    // Both window buttons tuck the menu away into the tray; the widgets keep running.
+    private void Close_Click(object sender, RoutedEventArgs e) => Hide();
 
-    private void Minimize_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+    private void Minimize_Click(object sender, RoutedEventArgs e) => Hide();
+
+    private void StartWithWindows_Changed(object sender, RoutedEventArgs e) =>
+        SetStartWithWindows(StartWithWindowsToggle.IsChecked == true);
+
+    /// <summary>Turns "Start with Windows" on or off (from the menu switch or the tray menu).</summary>
+    public void SetStartWithWindows(bool on)
+    {
+        if (StartWithWindowsToggle.IsChecked != on)
+            StartWithWindowsToggle.IsChecked = on; // keeps the switch in sync; calls back here once
+        if (_settings.StartWithWindows == on) return;
+        _settings.StartWithWindows = on;
+        _settings.Save();
+        StartupRegistration.Apply(on);
+        StartWithWindowsChanged?.Invoke(on);
+    }
+
+    public event Action<bool>? StartWithWindowsChanged;
 }

@@ -1,5 +1,7 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ProjetoWidget;
 
@@ -27,6 +29,9 @@ public partial class WidgetWindow : Window
         };
         // Music has buttons; clicks elsewhere on it still drag the widget.
         Host.IsHitTestVisible = Host.Content is Widgets.MusicView;
+
+        // Stuck to the desktop: behind all windows, still there on Win+D.
+        DesktopPin.Attach(this);
     }
 
     public WidgetOption Widget { get; }
@@ -77,19 +82,47 @@ public partial class WidgetWindow : Window
     }
 
     /// <summary>
-    /// Where the window can go when asked for (left, top): if the card would cover another one,
-    /// it slides out the shortest way so the edges just touch. If that isn't possible, it stays put.
+    /// Where the window can go when asked for (left, top):
+    /// the card stays whole inside one screen (the one under its center, above the taskbar),
+    /// and if it would cover another widget it slides out the shortest way so the edges just touch.
+    /// If that isn't possible, it stays put.
     /// </summary>
     private (double Left, double Top) Place(double left, double top)
     {
+        var scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
         var card = CardAt(left, top, Width, Height);
-        return Resolve(card, Obstacles().ToList()) is { } free
+        var screen = ScreenAreaAt(Center(card), scale);
+        return Resolve(ClampInto(card, screen), Obstacles().ToList(), screen) is { } free
             ? (free.Left - ShadowMargin, free.Top - ShadowMargin)
             : (Left, Top);
     }
 
-    /// <summary>Pushes <paramref name="card"/> out of any obstacle it overlaps. Null if it can't be freed.</summary>
-    public static Rect? Resolve(Rect card, IReadOnlyList<Rect> obstacles)
+    public static Point Center(Rect r) => new(r.X + r.Width / 2, r.Y + r.Height / 2);
+
+    /// <summary>Moves the card the least so it fits entirely inside <paramref name="area"/>.</summary>
+    public static Rect ClampInto(Rect card, Rect area)
+    {
+        card.X = Math.Clamp(card.X, area.Left, Math.Max(area.Left, area.Right - card.Width));
+        card.Y = Math.Clamp(card.Y, area.Top, Math.Max(area.Top, area.Bottom - card.Height));
+        return card;
+    }
+
+    /// <summary>Work area (screen minus taskbar) of the monitor at or nearest to a point, in WPF units.</summary>
+    public static Rect ScreenAreaAt(Point point, double scale)
+    {
+        var monitor = MonitorFromPoint(new POINT { X = (int)(point.X * scale), Y = (int)(point.Y * scale) }, MONITOR_DEFAULTTONEAREST);
+        var info = new MONITORINFO { cbSize = Marshal.SizeOf<MONITORINFO>() };
+        if (monitor == IntPtr.Zero || !GetMonitorInfo(monitor, ref info))
+            return SystemParameters.WorkArea;
+        var w = info.rcWork;
+        return new Rect(w.Left / scale, w.Top / scale, (w.Right - w.Left) / scale, (w.Bottom - w.Top) / scale);
+    }
+
+    /// <summary>
+    /// Pushes <paramref name="card"/> out of any obstacle it overlaps, never leaving <paramref name="bounds"/>.
+    /// Null if it can't be freed.
+    /// </summary>
+    public static Rect? Resolve(Rect card, IReadOnlyList<Rect> obstacles, Rect? bounds = null)
     {
         for (var pass = 0; pass < 8; pass++)
         {
@@ -98,7 +131,7 @@ public partial class WidgetWindow : Window
             {
                 if (!Overlaps(card, o)) continue;
 
-                // Four ways out; take the shortest.
+                // Four ways out; take the shortest one that stays on the screen.
                 var pushes = new[]
                 {
                     new Vector(o.Left - card.Right, 0),
@@ -106,14 +139,42 @@ public partial class WidgetWindow : Window
                     new Vector(0, o.Top - card.Bottom),
                     new Vector(0, o.Bottom - card.Top),
                 };
-                var push = pushes.MinBy(v => v.Length);
-                card.Offset(push);
+                var options = pushes
+                    .Select(p => { var c = card; c.Offset(p); return (Push: p, Card: c); })
+                    .Where(x => bounds is not { } b || Inside(x.Card, b))
+                    .ToList();
+                if (options.Count == 0) return null;
+                card = options.MinBy(x => x.Push.Length).Card;
                 moved = true;
             }
             if (!moved) return card;
         }
         return obstacles.Any(o => Overlaps(card, o)) ? null : card;
     }
+
+    private static bool Inside(Rect card, Rect area)
+    {
+        const double tolerance = 0.5;
+        return card.Left >= area.Left - tolerance && card.Right <= area.Right + tolerance &&
+               card.Top >= area.Top - tolerance && card.Bottom <= area.Bottom + tolerance;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct POINT { public int X, Y; }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RECT { public int Left, Top, Right, Bottom; }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MONITORINFO { public int cbSize; public RECT rcMonitor; public RECT rcWork; public uint dwFlags; }
+
+    private const uint MONITOR_DEFAULTTONEAREST = 2;
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr MonitorFromPoint(POINT pt, uint flags);
+
+    [DllImport("user32.dll")]
+    private static extern bool GetMonitorInfo(IntPtr monitor, ref MONITORINFO info);
 
     /// <summary>True if the two cards cover each other. Touching edges is fine.</summary>
     public static bool Overlaps(Rect a, Rect b)

@@ -18,6 +18,9 @@ public sealed class Settings
     /// <summary>Menu and widgets in dark mode.</summary>
     public bool DarkMode { get; set; }
 
+    /// <summary>Open the app (in the tray, with its widgets) when Windows starts. On by default.</summary>
+    public bool StartWithWindows { get; set; } = true;
+
     /// <summary>Music widget: the preferred app (Apple Music, YouTube Music or Spotify).</summary>
     public string MusicApp
     {
