@@ -6,7 +6,23 @@
 
 Desktop widgets for Windows in the style of macOS widgets: frosted glass, rounded corners and the soft blue → pink → orange colors of the logo.
 
-The app ships as a single `.exe` for PC.
+<p align="center">
+  <a href="https://github.com/gigilucas/Widglass/releases/latest/download/Widglass.exe"><b>⬇ Download Widglass for Windows</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://gigi-apps.github.io">gigi-apps.github.io</a>
+</p>
+
+## Download
+
+1. Download **[Widglass.exe](https://github.com/gigilucas/Widglass/releases/latest/download/Widglass.exe)**.
+2. Open it. That's all: **nothing else to install**, everything works right away.
+
+- Works on Windows 10 (1809 or later) and Windows 11.
+- The first time, Windows may say *"Windows protected your PC"*: click **More info** and then **Run anyway**.
+- Widglass then sits in the notification area (the **^** arrow next to the clock) and starts with Windows.
+- Keep the file somewhere it can stay (for example a *Widglass* folder in *Documents*), since Windows opens it from there at startup.
+
+All versions are on the [Releases page](https://github.com/gigilucas/Widglass/releases). More apps by the same author: **[gigi-apps.github.io](https://gigi-apps.github.io)**.
 
 <p align="center">
   <img src="docs/screenshots/widget-clock.png" alt="Clock widget" title="Clock" width="19%">
@@ -106,57 +122,6 @@ The widgets become smoked dark glass with white text, and keep the logo colors i
   <img src="docs/screenshots/dark/settings-weather.png" alt="Weather settings, dark" width="31%">
 </p>
 
-## Tech stack
+## Source code
 
-- **C# / .NET 10 / WPF**, targeting the Windows 10 SDK (for location and media controls). Published as one self-contained `.exe`.
-- Windows APIs: `Windows.Devices.Geolocation` (location), `GlobalSystemMediaTransportControlsSessionManager` (music), performance counters and `GlobalMemoryStatusEx` (CPU / RAM).
-- Pinning: each widget window is owned by the desktop window that holds the icons (`Progman`, or a `WorkerW` with a wallpaper slideshow), kept just above it in the z-order, and re-pinned if Explorer restarts. See [`DesktopPin.cs`](src/Widglass/DesktopPin.cs).
-
-## Getting started
-
-Requirements: Windows 10 (1809 or later) or Windows 11, and the [.NET 10 SDK](https://dotnet.microsoft.com/download) to build.
-
-Run from source:
-
-```powershell
-dotnet run --project src/Widglass
-```
-
-Build the `.exe` (self-contained, no .NET install needed on the target PC):
-
-```powershell
-dotnet publish src/Widglass -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o publish
-```
-
-The app ends up in `publish/Widglass.exe`.
-
-### Developer options
-
-| Option | What it does |
-| --- | --- |
-| `--screenshot out.png` | Saves an image of the manager window and exits. |
-| `--screenshot out.png --page clock` | Same, showing that widget's settings. |
-| `--screenshot out.png --widget weather` | Saves an image of one widget instead. |
-| `--background` | Starts with only the widgets and the tray icon, no menu (used by *Start with Windows*). |
-| `--location 38.72,-9.14` | Uses these coordinates for the weather instead of the PC's location. |
-| `--music-test FakePlayer:Spotify` | Lets the Music widget follow a test media session whose id contains `FakePlayer`, labelled *Spotify*. |
-
-The screenshots in this README were made with these options. [`tools/make-icon.ps1`](tools/make-icon.ps1) rebuilds the app icon from `docs/logo.png`.
-
-## Project structure
-
-```
-src/Widglass/
-  MainWindow.xaml        Manager window: widget list, settings pages
-  WidgetWindow.xaml      One widget on the desktop (glass card)
-  DesktopPin.cs          Keeps widgets pinned to the desktop
-  TrayIcon.cs            Icon in the notification area
-  StartupRegistration.cs Start with Windows
-  Widgets/               Content and settings view of each widget
-  Services/              Weather, music and CPU / RAM data
-  Themes/                Light and dark colors (menu and widgets)
-  Settings.cs            Saved choices
-docs/                    Logo and screenshots (docs/screenshots/dark for dark mode)
-design/                  Early HTML mockups of the widgets
-tools/                   Helper scripts
-```
+Widglass is written in C# / WPF. To build it yourself or change the code, see [docs/DEVELOPING.md](docs/DEVELOPING.md). To just use the app, you only need the download above.

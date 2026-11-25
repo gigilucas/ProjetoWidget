@@ -1,0 +1,54 @@
+# Builds Widglass.exe and publishes it as a GitHub Release when a version tag is pushed (e.g. v0.1.0).
+# The download link https://github.com/gigilucas/Widglass/releases/latest/download/Widglass.exe
+# always points to the newest version.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag to release (e.g. v0.1.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build Widglass.exe
+        shell: pwsh
+        run: |
+          $version = $env:TAG.TrimStart('v')
+          dotnet publish src/Widglass/Widglass.csproj -c Release -r win-x64 --self-contained true `
+            -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true -p:Version=$version -o publish
+
+      - name: Publish the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $notes = @"
+          ## Download
+
+          Download **Widglass.exe** below and open it. That's all: nothing else to install.
+
+          - Works on Windows 10 (1809 or later) and Windows 11.
+          - The first time, Windows may say "Windows protected your PC": click **More info** and then **Run anyway**.
+          - Widglass then lives in the notification area (the ^ arrow next to the clock) and starts with Windows.
+
+          More apps: https://gigi-apps.github.io
+          "@
+          gh release create $env:TAG publish/Widglass.exe --title "Widglass $env:TAG" --notes $notes
