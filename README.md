@@ -30,6 +30,8 @@ The app opens a small manager window that lists the five widgets.
 - **On/off switch**: shows or hides that widget on the desktop.
 - **Click a row** (not the switch): opens that widget's settings. **‹ Widgets** goes back.
 - **Drag a widget** anywhere on the screen; its position is remembered.
+- **Widgets never cover each other**: they can touch, but if you drag one onto another it slides out the shortest way and stays edge to edge. A widget that opens where another one already is moves to the nearest free spot.
+- **Dark mode** (under *Appearance*): switches the menu and all the widgets to dark at once. See [Dark mode](#dark-mode).
 - Widgets don't show up in the taskbar or in Alt+Tab.
 - Your choices are saved in `%AppData%\ProjetoWidget\settings.json`, and the widgets that were on come back the next time you open the app.
 - Closing the manager window (red button) closes the app and its widgets.
@@ -38,7 +40,7 @@ The app opens a small manager window that lists the five widgets.
 
 ### Clock
 
-<img src="docs/screenshots/widget-clock.png" alt="Analog clock" width="160"> <img src="docs/screenshots/widget-clock-digital.png" alt="Digital clock" width="160">
+<img src="docs/screenshots/widget-clock.png" alt="Analog clock" width="160"> <img src="docs/screenshots/widget-clock-digital.png" alt="Digital clock" width="160"> <img src="docs/screenshots/dark/widget-clock-digital.png" alt="Digital clock, dark" width="160">
 
 - Time and time zone come from this PC.
 - **Style** (in settings): **Analog**, a clock face with hour, minute and second hands, or **Digital**, big numbers with seconds, the weekday and the date. The change applies right away.
@@ -77,6 +79,26 @@ The app opens a small manager window that lists the five widgets.
 - Browsers are ignored (a video playing in Edge never shows up). YouTube Music counts only when it's **installed as an app**: open [music.youtube.com](https://music.youtube.com) in Chrome or Edge and choose *Install YouTube Music*.
 - When nothing is playing, the widget shows *Not playing* and a button to open the chosen app, or to get it from the Microsoft Store if it isn't installed.
 - It reads and controls the music through the Windows media controls (the same ones the volume flyout uses), so no login is needed.
+
+## Dark mode
+
+Turn on **Dark mode** in the menu, under *Appearance*. The menu and every widget on the desktop change right away, and the choice is saved.
+
+The widgets become smoked dark glass with white text, and keep the logo colors in the clock hands, rings, today's date, the play button and the progress bar.
+
+<p align="center">
+  <img src="docs/screenshots/dark/widget-clock.png" alt="Clock widget, dark" title="Clock" width="19%">
+  <img src="docs/screenshots/dark/widget-cpu-ram.png" alt="CPU / RAM widget, dark" title="CPU / RAM" width="19%">
+  <img src="docs/screenshots/dark/widget-calendar.png" alt="Calendar widget, dark" title="Calendar" width="19%">
+  <img src="docs/screenshots/dark/widget-weather.png" alt="Weather widget, dark" title="Weather" width="19%">
+  <img src="docs/screenshots/dark/widget-music.png" alt="Music widget, dark" title="Music" width="19%">
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/dark/manager.png" alt="Manager window, dark" width="31%">
+  <img src="docs/screenshots/dark/settings-clock.png" alt="Clock settings, dark" width="31%">
+  <img src="docs/screenshots/dark/settings-weather.png" alt="Weather settings, dark" width="31%">
+</p>
 
 ## Not done yet
 
@@ -126,8 +148,9 @@ src/ProjetoWidget/
   WidgetWindow.xaml      One widget on the desktop (glass card)
   Widgets/               Content and settings view of each widget
   Services/              Weather, music and CPU / RAM data
+  Themes/                Light and dark colors (menu and widgets)
   Settings.cs            Saved choices
-docs/                    Logo and screenshots
+docs/                    Logo and screenshots (docs/screenshots/dark for dark mode)
 design/                  Early HTML mockups of the widgets
 tools/                   Helper scripts
 ```
