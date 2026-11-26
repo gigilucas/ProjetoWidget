@@ -13,7 +13,7 @@
     <AssemblyName>Widglass</AssemblyName>
     <RootNamespace>Widglass</RootNamespace>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Product>Widglass</Product>
     <Description>macOS-style desktop widgets for Windows, pinned to the wallpaper</Description>
   </PropertyGroup>

@@ -38,6 +38,8 @@ git push origin v0.1.0
 
 The download link `https://github.com/gigilucas/Widglass/releases/latest/download/Widglass.exe` always points to the newest release.
 
+Installed copies update themselves from the same place ([`UpdateService.cs`](../src/Widglass/Services/UpdateService.cs)): they read `releases/latest` from the GitHub API, and if its tag is a higher version than their own and it has a `Widglass.exe` asset, they offer it. Updating downloads it next to the running `.exe` as `Widglass.exe.new`, renames the running file to `Widglass.exe.old`, moves the new one into place, starts it with `--wait-for <pid> --updated` and quits; the new copy deletes the `.old` file once the old process is gone. So a release only needs the tag pushed: the version number comes from the tag.
+
 ## Developer options
 
 | Option | What it does |
@@ -47,6 +49,7 @@ The download link `https://github.com/gigilucas/Widglass/releases/latest/downloa
 | `--screenshot out.png --widget weather` | Saves an image of one widget instead. |
 | `--background` | Starts with only the widgets and the tray icon, no menu (used by *Start with Windows*). |
 | `--location 38.72,-9.14` | Uses these coordinates for the weather instead of the PC's location. |
+| `--update-feed feed.json` | Reads the "latest release" from a local JSON file (same shape as GitHub's API; the download URL can be a `file:///` path) to test updates. |
 | `--music-test FakePlayer:Spotify` | Lets the Music widget follow a test media session whose id contains `FakePlayer`, labelled *Spotify*. |
 
 The screenshots in the README were made with these options. [`tools/make-icon.ps1`](../tools/make-icon.ps1) rebuilds the app icon from `docs/logo.png`.
@@ -61,7 +64,7 @@ src/Widglass/
   TrayIcon.cs            Icon in the notification area
   StartupRegistration.cs Start with Windows
   Widgets/               Content and settings view of each widget
-  Services/              Weather, music and CPU / RAM data
+  Services/              Weather, music, CPU / RAM data and updates
   Themes/                Light and dark colors (menu and widgets)
   Settings.cs            Saved choices
 docs/                    Logo, screenshots, this page

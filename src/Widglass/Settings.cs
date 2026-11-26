@@ -21,6 +21,9 @@ public sealed class Settings
     /// <summary>Open the app (in the tray, with its widgets) when Windows starts. On by default.</summary>
     public bool StartWithWindows { get; set; } = true;
 
+    /// <summary>Install new versions without asking (otherwise the app just tells you). Off by default.</summary>
+    public bool AutoInstallUpdates { get; set; }
+
     /// <summary>Music widget: the preferred app (Apple Music, YouTube Music or Spotify).</summary>
     public string MusicApp
     {

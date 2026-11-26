@@ -24,10 +24,12 @@ public sealed class TrayIcon : IDisposable
         };
         _startWithWindows.CheckedChanged += (_, _) => menu.SetStartWithWindows(_startWithWindows.Checked);
         menu.StartWithWindowsChanged += on => _startWithWindows.Checked = on;
+        var checkUpdates = new WinForms.ToolStripMenuItem("Check for updates", null,
+            async (_, _) => await menu.CheckForUpdatesAsync(userAsked: true));
         var quit = new WinForms.ToolStripMenuItem("Quit", null, (_, _) => menu.Quit());
 
         var contextMenu = new WinForms.ContextMenuStrip();
-        contextMenu.Items.AddRange([open, _startWithWindows, new WinForms.ToolStripSeparator(), quit]);
+        contextMenu.Items.AddRange([open, _startWithWindows, checkUpdates, new WinForms.ToolStripSeparator(), quit]);
 
         _icon = new WinForms.NotifyIcon
         {
@@ -41,6 +43,16 @@ public sealed class TrayIcon : IDisposable
             if (e.Button == WinForms.MouseButtons.Left)
                 menu.ShowMenu();
         };
+        _icon.BalloonTipClicked += (_, _) => _onNotificationClick?.Invoke();
+    }
+
+    private Action? _onNotificationClick;
+
+    /// <summary>Shows a Windows notification from the tray icon; <paramref name="onClick"/> runs if it's clicked.</summary>
+    public void Notify(string title, string text, Action? onClick = null)
+    {
+        _onNotificationClick = onClick;
+        _icon.ShowBalloonTip(8000, title, text, WinForms.ToolTipIcon.Info);
     }
 
     private static System.Drawing.Icon LoadIcon()

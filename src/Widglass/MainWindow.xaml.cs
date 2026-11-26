@@ -39,6 +39,7 @@ public partial class MainWindow : Window
         WidgetList.ItemsSource = _widgets;
         DarkModeToggle.IsChecked = _settings.DarkMode;
         StartWithWindowsToggle.IsChecked = _settings.StartWithWindows;
+        AutoUpdateToggle.IsChecked = _settings.AutoInstallUpdates;
         UpdateSummary();
 
         // Dev aid: "Widglass.exe --screenshot out.png" saves an image of the window and exits.
@@ -52,6 +53,11 @@ public partial class MainWindow : Window
             && double.TryParse(lat, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var la)
             && double.TryParse(lon, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var lo))
             Services.WeatherService.OverrideLocation(la, lo);
+
+        // Dev aid: "--update-feed feed.json" reads the latest release from a local file (to test updates).
+        var u = Array.IndexOf(args, "--update-feed");
+        if (u >= 0 && u + 1 < args.Length)
+            Services.UpdateService.OverrideFeed(args[u + 1]);
 
         // Dev aid: "--music-test powershell" lets the music widget follow a test media session.
         var m = Array.IndexOf(args, "--music-test");
@@ -85,6 +91,8 @@ public partial class MainWindow : Window
                     target = widgetWindow;
                 }
                 // let animations finish; widgets that load data (weather, CPU) get a few seconds
+                if (u >= 0)
+                    await CheckForUpdatesAsync(userAsked: false, allowAutoInstall: false); // shows the banner in the image
                 await Task.Delay(widgetToCapture is null ? 600 : 10000);
                 SaveScreenshot(target, args[i + 1]);
                 widgetWindow?.Close();
@@ -119,6 +127,7 @@ public partial class MainWindow : Window
     {
         foreach (var widget in _widgets.Where(w => w.IsOn))
             ShowWidget(widget);
+        StartUpdateChecks();
     }
 
     /// <summary>Shows the menu and brings it to the front (from the tray icon or a second launch).</summary>
@@ -267,7 +276,7 @@ public partial class MainWindow : Window
     private void UpdateSummary()
     {
         var on = _widgets.Count(w => w.IsOn);
-        Summary.Text = $"{on} of {_widgets.Count} widgets on";
+        Summary.Text = $"{on} of {_widgets.Count} widgets on  ·  v{Services.UpdateService.Format(Services.UpdateService.CurrentVersion)}";
     }
 
     // Rounded corners for the whole window content
@@ -381,4 +390,107 @@ public partial class MainWindow : Window
     }
 
     public event Action<bool>? StartWithWindowsChanged;
+
+    // ---------- Updates ----------
+
+    /// <summary>The icon in the notification area, for update notifications (set by App).</summary>
+    public TrayIcon? Tray { get; set; }
+
+    private readonly System.Windows.Threading.DispatcherTimer _updateTimer = new() { Interval = TimeSpan.FromHours(6) };
+    private Services.UpdateInfo? _pendingUpdate;
+    private bool _installing;
+
+    /// <summary>First check shortly after start, then every 6 hours.</summary>
+    private void StartUpdateChecks()
+    {
+        _updateTimer.Tick += async (_, _) => await CheckForUpdatesAsync(userAsked: false);
+        _updateTimer.Start();
+        var first = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(20) };
+        first.Tick += async (_, _) => { first.Stop(); await CheckForUpdatesAsync(userAsked: false); };
+        first.Start();
+    }
+
+    /// <summary>
+    /// Looks for a newer version. If there is one: installs it right away when "Auto-install updates" is on,
+    /// otherwise shows it in the menu and as a notification.
+    /// </summary>
+    public async Task CheckForUpdatesAsync(bool userAsked, bool allowAutoInstall = true)
+    {
+        if (_installing) return;
+        Services.UpdateInfo? update;
+        try
+        {
+            update = await Services.UpdateService.CheckAsync();
+        }
+        catch (Exception)
+        {
+            if (userAsked)
+                Tray?.Notify("Widglass", "Couldn't check for updates. Check the internet connection.");
+            return;
+        }
+
+        if (update is null)
+        {
+            if (userAsked)
+                Tray?.Notify("Widglass is up to date", $"You have the latest version, {Services.UpdateService.Format(Services.UpdateService.CurrentVersion)}.");
+            return;
+        }
+
+        var isNew = _pendingUpdate?.Version != update.Version;
+        _pendingUpdate = update;
+        ShowUpdateBanner(update);
+
+        if (allowAutoInstall && _settings.AutoInstallUpdates)
+            await InstallUpdateAsync();
+        else if (isNew || userAsked)
+            Tray?.Notify("Widglass update available", $"Version {update.VersionText} is ready. Click here to update.", ShowMenu);
+    }
+
+    private void ShowUpdateBanner(Services.UpdateInfo update)
+    {
+        UpdateTitle.Text = "Update available";
+        UpdateText.Text = $"Version {update.VersionText} is ready (you have {Services.UpdateService.Format(Services.UpdateService.CurrentVersion)}).";
+        UpdateButton.IsEnabled = true;
+        if (UpdateBanner.Visibility != Visibility.Visible)
+        {
+            UpdateBanner.Visibility = Visibility.Visible;
+            // Make room for the banner so the widget list isn't squeezed
+            UpdateBanner.Measure(new Size(UpdateBanner.ActualWidth > 0 ? UpdateBanner.ActualWidth : 388, double.PositiveInfinity));
+            Height += UpdateBanner.DesiredSize.Height + UpdateBanner.Margin.Bottom;
+        }
+    }
+
+    private async void Update_Click(object sender, RoutedEventArgs e) => await InstallUpdateAsync();
+
+    private async Task InstallUpdateAsync()
+    {
+        if (_pendingUpdate is not { } update || _installing) return;
+        _installing = true;
+        UpdateButton.IsEnabled = false;
+        UpdateTitle.Text = $"Updating to {update.VersionText}…";
+        var progress = new Progress<double>(p => UpdateText.Text = $"Downloading… {p:P0}");
+        try
+        {
+            await Services.UpdateService.InstallAsync(update, progress, showMenuAfter: IsVisible);
+            UpdateText.Text = "Restarting…";
+            Quit(); // the new version starts as soon as this one has closed
+        }
+        catch (Exception)
+        {
+            _installing = false;
+            UpdateTitle.Text = "Couldn't update";
+            UpdateText.Text = "Try again, or download it from the website.";
+            UpdateButton.IsEnabled = true;
+        }
+    }
+
+    private void AutoUpdate_Changed(object sender, RoutedEventArgs e)
+    {
+        var on = AutoUpdateToggle.IsChecked == true;
+        if (_settings.AutoInstallUpdates == on) return;
+        _settings.AutoInstallUpdates = on;
+        _settings.Save();
+        if (on && _pendingUpdate is not null)
+            _ = InstallUpdateAsync();
+    }
 }

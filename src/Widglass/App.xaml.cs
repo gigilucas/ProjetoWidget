@@ -29,6 +29,15 @@ public partial class App : Application
             return;
         }
 
+        // Just updated: wait for the old version to finish closing before taking over.
+        var w = Array.IndexOf(e.Args, "--wait-for");
+        if (w >= 0 && w + 1 < e.Args.Length && int.TryParse(e.Args[w + 1], out var oldPid))
+        {
+            try { System.Diagnostics.Process.GetProcessById(oldPid).WaitForExit(20000); }
+            catch (ArgumentException) { /* already gone */ }
+        }
+        Services.UpdateService.CleanUpAfterUpdate();
+
         // Already running? Ask that copy to show its menu, and stop here.
         _instance = new Mutex(true, InstanceName, out var isFirst);
         _showMenu = new EventWaitHandle(false, EventResetMode.AutoReset, ShowMenuSignal);
@@ -42,11 +51,15 @@ public partial class App : Application
         var menu = new MainWindow();
         MainWindow = menu;
         _tray = new TrayIcon(menu);
+        menu.Tray = _tray;
         StartupRegistration.Apply(Widglass.Settings.Current.StartWithWindows); // keeps the .exe path current
         menu.StartWidgets();
 
         if (!e.Args.Contains(StartupRegistration.BackgroundArg))
             menu.ShowMenu();
+        if (e.Args.Contains("--updated"))
+            _tray.Notify("Widglass updated",
+                $"You now have version {Services.UpdateService.Format(Services.UpdateService.CurrentVersion)}.");
 
         // A second launch (e.g. from a shortcut) opens this copy's menu.
         var waiter = new Thread(() =>

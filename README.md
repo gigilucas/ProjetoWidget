@@ -20,6 +20,7 @@ Desktop widgets for Windows in the style of macOS widgets: frosted glass, rounde
 - Works on Windows 10 (1809 or later) and Windows 11.
 - The first time, Windows may say *"Windows protected your PC"*: click **More info** and then **Run anyway**.
 - Widglass then sits in the notification area (the **^** arrow next to the clock) and starts with Windows.
+- It **keeps itself up to date**: when a new version comes out, Widglass tells you and updates with one click (from version 0.2.0 on).
 - Keep the file somewhere it can stay (for example a *Widglass* folder in *Documents*), since Windows opens it from there at startup.
 
 All versions are on the [Releases page](https://github.com/gigilucas/Widglass/releases). More apps by the same author: **[gigi-apps.github.io](https://gigi-apps.github.io)**.
@@ -35,7 +36,7 @@ All versions are on the [Releases page](https://github.com/gigilucas/Widglass/re
 
 ## How it works
 
-The app lives in the **notification area** (the **^** arrow next to the clock on the taskbar), not on the taskbar like a normal app. **Click its icon** to open the menu; right-click it for *Open Widglass*, *Start with Windows* and *Quit*.
+The app lives in the **notification area** (the **^** arrow next to the clock on the taskbar), not on the taskbar like a normal app. **Click its icon** to open the menu; right-click it for *Open Widglass*, *Start with Windows*, *Check for updates* and *Quit*.
 
 The menu lists the five widgets.
 
@@ -53,6 +54,7 @@ The menu lists the five widgets.
 - **Widgets never cover each other**: they can touch, but if you drag one onto another it slides out the shortest way and stays edge to edge. A widget that opens where another one already is moves to the nearest free spot.
 - **Dark mode** (under *App*): switches the menu and all the widgets to dark at once. See [Dark mode](#dark-mode).
 - **Start with Windows** (under *App*, on by default): when the PC starts, the widgets appear on the desktop and the icon goes to the notification area; the menu stays closed until you click the icon.
+- **Updates**: Widglass checks for a new version when it starts and every few hours. When there is one, you get a notification and an **Update** button at the top of the menu; it downloads the new version, swaps it in and restarts, keeping your widgets, positions and settings. Turn on **Auto-install updates** (under *App*) to have this happen by itself. You can also right-click the icon and choose *Check for updates*. The version you have is shown at the bottom of the menu.
 - The red and yellow buttons tuck the menu away into the notification area; the widgets keep running. To close everything, right-click the icon and choose **Quit**.
 - Only one copy runs at a time: opening the app again just brings up its menu.
 - Widgets don't show up in the taskbar or in Alt+Tab.
