@@ -23,3 +23,6 @@ Desktop.ini
 # Local
 .claude/settings.local.json
 .env
+
+# Developer-only pages (download stats)
+private/

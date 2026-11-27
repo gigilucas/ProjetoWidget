@@ -7,14 +7,12 @@
 Desktop widgets for Windows in the style of macOS widgets: frosted glass, rounded corners and the soft blue → pink → orange colors of the logo.
 
 <p align="center">
-  <a href="https://github.com/gigilucas/Widglass/releases/latest/download/Widglass.exe"><b>⬇ Download Widglass for Windows</b></a>
-  &nbsp;·&nbsp;
-  <a href="https://gigi-apps.github.io">gigi-apps.github.io</a>
+  <a href="https://gigi-apps.github.io"><b>Download it at gigi-apps.github.io</b></a>
 </p>
 
 ## Download
 
-1. Download **[Widglass.exe](https://github.com/gigilucas/Widglass/releases/latest/download/Widglass.exe)**.
+1. Go to **[gigi-apps.github.io](https://gigi-apps.github.io)** and click **Download for Windows**.
 2. Open it. That's all: **nothing else to install**, everything works right away.
 
 - Works on Windows 10 (1809 or later) and Windows 11.
@@ -23,7 +21,7 @@ Desktop widgets for Windows in the style of macOS widgets: frosted glass, rounde
 - It **keeps itself up to date**: new versions install by themselves, so you always have the latest Widglass.
 - Keep the file somewhere it can stay (for example a *Widglass* folder in *Documents*), since Windows opens it from there at startup.
 
-All versions are on the [Releases page](https://github.com/gigilucas/Widglass/releases). More apps by the same author: **[gigi-apps.github.io](https://gigi-apps.github.io)**.
+More apps by the same author are on the same site.
 
 <p align="center">
   <img src="docs/screenshots/widget-clock.png" alt="Clock widget" title="Clock" width="19%">

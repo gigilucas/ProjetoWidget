@@ -43,7 +43,8 @@ jobs:
           $notes = @"
           ## Download
 
-          Download **Widglass.exe** below and open it. That's all: nothing else to install.
+          Download **Widglass.exe** below (or from https://gigi-apps.github.io) and open it. That's all: nothing else to install.
+          (*Widglass-update.exe* is the same app, used by Widglass to update itself.)
 
           - Works on Windows 10 (1809 or later) and Windows 11.
           - The first time, Windows may say "Windows protected your PC": click **More info** and then **Run anyway**.
@@ -51,4 +52,7 @@ jobs:
 
           More apps: https://gigi-apps.github.io
           "@
-          gh release create $env:TAG publish/Widglass.exe --title "Widglass $env:TAG" --notes $notes
+          # The same file twice: Widglass.exe is what people download (its download count is real downloads),
+          # Widglass-update.exe is what the app fetches when it updates itself.
+          Copy-Item publish/Widglass.exe publish/Widglass-update.exe
+          gh release create $env:TAG publish/Widglass.exe publish/Widglass-update.exe --title "Widglass $env:TAG" --notes $notes

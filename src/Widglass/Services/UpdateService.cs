@@ -21,7 +21,12 @@ public static class UpdateService
 {
     private const string LatestReleaseApi = "https://api.github.com/repos/gigilucas/Widglass/releases/latest";
     public const string ReleasesPage = "https://github.com/gigilucas/Widglass/releases/latest";
-    private const string AssetName = "Widglass.exe";
+
+    // Each release has the same .exe twice: "Widglass.exe" for people downloading it from the website,
+    // and "Widglass-update.exe" for the app updating itself. GitHub counts downloads per file,
+    // so the first number is real downloads and isn't inflated by updates.
+    private const string UpdateAssetName = "Widglass-update.exe";
+    private const string AssetName = "Widglass.exe"; // older releases only have this one
 
     // Static fields are initialized in the order they are written: CurrentVersion must come before Http,
     // which uses it for its User-Agent.
@@ -67,10 +72,12 @@ public static class UpdateService
         if (latest <= CurrentVersion)
             return null;
 
-        foreach (var asset in root.GetProperty("assets").EnumerateArray())
+        var assets = root.GetProperty("assets").EnumerateArray()
+            .Where(a => a.GetProperty("name").GetString() is { } n &&
+                        (n.Equals(UpdateAssetName, StringComparison.OrdinalIgnoreCase) || n.Equals(AssetName, StringComparison.OrdinalIgnoreCase)))
+            .OrderBy(a => a.GetProperty("name").GetString()!.Equals(UpdateAssetName, StringComparison.OrdinalIgnoreCase) ? 0 : 1);
+        foreach (var asset in assets)
         {
-            if (!string.Equals(asset.GetProperty("name").GetString(), AssetName, StringComparison.OrdinalIgnoreCase))
-                continue;
             var url = asset.GetProperty("browser_download_url").GetString();
             if (string.IsNullOrEmpty(url))
                 continue;

@@ -1,6 +1,6 @@
 # Developing Widglass
 
-This page is for working on the code. To use the app, just download `Widglass.exe` from the [Releases page](https://github.com/gigilucas/Widglass/releases/latest).
+This page is for working on the code. To use the app, just download it from [gigi-apps.github.io](https://gigi-apps.github.io).
 
 ## Tech stack
 
@@ -36,9 +36,9 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-The download link `https://github.com/gigilucas/Widglass/releases/latest/download/Widglass.exe` always points to the newest release.
+Each release has the same `.exe` twice: `Widglass.exe`, which the website's download button points to (`https://github.com/gigilucas/Widglass/releases/latest/download/Widglass.exe`, always the newest release), and `Widglass-update.exe`, which installed copies fetch when they update. GitHub counts downloads per file, so the download count of `Widglass.exe` is the number of people who downloaded the app, not inflated by updates (releases before 1.0.1 only have `Widglass.exe`, so their count includes updates).
 
-Installed copies update themselves from the same place ([`UpdateService.cs`](../src/Widglass/Services/UpdateService.cs)): they read `releases/latest` from the GitHub API, and if its tag is a higher version than their own and it has a `Widglass.exe` asset, they install it right away (from 1.0.0 on there is no switch for this: everyone stays on the latest version). Updating downloads it next to the running `.exe` as `Widglass.exe.new`, renames the running file to `Widglass.exe.old`, moves the new one into place, starts it with `--wait-for <pid> --updated` and quits; the new copy deletes the `.old` file once the old process is gone. So a release only needs the tag pushed: the version number comes from the tag.
+Installed copies update themselves from the same place ([`UpdateService.cs`](../src/Widglass/Services/UpdateService.cs)): they read `releases/latest` from the GitHub API, and if its tag is a higher version than their own and it has a `Widglass-update.exe` (or, in older releases, `Widglass.exe`) asset, they install it right away (from 1.0.0 on there is no switch for this: everyone stays on the latest version). Updating downloads it next to the running `.exe` as `Widglass.exe.new`, renames the running file to `Widglass.exe.old`, moves the new one into place, starts it with `--wait-for <pid> --updated` and quits; the new copy deletes the `.old` file once the old process is gone. So a release only needs the tag pushed: the version number comes from the tag.
 
 ## Developer options
 
