@@ -20,7 +20,7 @@ Desktop widgets for Windows in the style of macOS widgets: frosted glass, rounde
 - Works on Windows 10 (1809 or later) and Windows 11.
 - The first time, Windows may say *"Windows protected your PC"*: click **More info** and then **Run anyway**.
 - Widglass then sits in the notification area (the **^** arrow next to the clock) and starts with Windows.
-- It **keeps itself up to date**: when a new version comes out, Widglass tells you and updates with one click (from version 0.2.0 on).
+- It **keeps itself up to date**: new versions install by themselves, so you always have the latest Widglass.
 - Keep the file somewhere it can stay (for example a *Widglass* folder in *Documents*), since Windows opens it from there at startup.
 
 All versions are on the [Releases page](https://github.com/gigilucas/Widglass/releases). More apps by the same author: **[gigi-apps.github.io](https://gigi-apps.github.io)**.
@@ -32,13 +32,18 @@ All versions are on the [Releases page](https://github.com/gigilucas/Widglass/re
   <img src="docs/screenshots/widget-weather.png" alt="Weather widget" title="Weather" width="19%">
   <img src="docs/screenshots/widget-music.png" alt="Music widget" title="Music" width="19%">
 </p>
-<p align="center"><sub>Clock · CPU / RAM · Calendar · Weather · Music — screenshots of the real app</sub></p>
+<p align="center">
+  <img src="docs/screenshots/widget-stocks-wide.png" alt="Stocks widget with three stocks" title="Stocks" width="39%">
+  <img src="docs/screenshots/widget-currency.png" alt="Currency widget" title="Currency" width="19%">
+  <img src="docs/screenshots/widget-photos.png" alt="Photos widget" title="Photos" width="19%">
+</p>
+<p align="center"><sub>Clock · CPU / RAM · Calendar · Weather · Music · Stocks · Currency · Photos — screenshots of the real app</sub></p>
 
 ## How it works
 
 The app lives in the **notification area** (the **^** arrow next to the clock on the taskbar), not on the taskbar like a normal app. **Click its icon** to open the menu; right-click it for *Open Widglass*, *Start with Windows*, *Check for updates* and *Quit*.
 
-The menu lists the five widgets.
+The menu lists the eight widgets; scroll the list to see them all.
 
 <p align="center">
   <img src="docs/screenshots/manager.png" alt="Manager window" width="31%">
@@ -53,8 +58,8 @@ The menu lists the five widgets.
 - **Always whole on a screen**: a widget can't go past the screen edges or under the taskbar. With more than one monitor you can drag it from screen to screen; it jumps over when its center crosses, so it never sits half on each. If a monitor is unplugged or the resolution changes, widgets move back onto a screen.
 - **Widgets never cover each other**: they can touch, but if you drag one onto another it slides out the shortest way and stays edge to edge. A widget that opens where another one already is moves to the nearest free spot.
 - **Dark mode** (under *App*): switches the menu and all the widgets to dark at once. See [Dark mode](#dark-mode).
-- **Start with Windows** (under *App*, on by default): when the PC starts, the widgets appear on the desktop and the icon goes to the notification area; the menu stays closed until you click the icon.
-- **Updates**: Widglass checks for a new version when it starts and every few hours. When there is one, you get a notification and an **Update** button at the top of the menu; it downloads the new version, swaps it in and restarts, keeping your widgets, positions and settings. Turn on **Auto-install updates** (under *App*) to have this happen by itself. You can also right-click the icon and choose *Check for updates*. The version you have is shown at the bottom of the menu.
+- **Start with Windows** (under *App*, on from the first time you open Widglass): when the PC starts, the widgets appear on the desktop and the icon goes to the notification area; the menu stays closed until you click the icon. Turn it off there if you'd rather open Widglass yourself.
+- **Always up to date**: Widglass checks for a new version when it starts and every few hours, and installs it by itself: it downloads it, swaps it in and restarts in a few seconds, keeping your widgets, positions and settings. The top of the menu shows the progress, and a notification tells you when it's done. You can also right-click the icon and choose *Check for updates*. The version you have is shown at the bottom of the menu.
 - The red and yellow buttons tuck the menu away into the notification area; the widgets keep running. To close everything, right-click the icon and choose **Quit**.
 - Only one copy runs at a time: opening the app again just brings up its menu.
 - Widgets don't show up in the taskbar or in Alt+Tab.
@@ -104,11 +109,46 @@ The menu lists the five widgets.
 - When nothing is playing, the widget shows *Not playing* and a button to open the chosen app, or to get it from the Microsoft Store if it isn't installed.
 - It reads and controls the music through the Windows media controls (the same ones the volume flyout uses), so no login is needed.
 
+### Stocks
+
+<img src="docs/screenshots/widget-stocks.png" alt="Stocks widget with one stock" width="160"> <img src="docs/screenshots/widget-stocks-wide.png" alt="Stocks widget with three stocks" width="330">
+
+- **Live prices**, refreshed every 5 seconds while the market is open, with today's chart. The price **flashes green or red** when it moves, like on Yahoo Finance.
+- **Show 1, 2 or 3 stocks** (in settings). With 1 the widget is a square with a big chart; with 2 or 3 it becomes a wide rectangle with a row per stock: name, mini chart, price and today's change.
+- Pick each one by searching a company, symbol or crypto (Apple, TSLA, Bitcoin, S&P 500...), or from the popular picks.
+- The chip says **Live** while the market is trading and **Closed** when it isn't. Crypto trades all the time.
+- Prices from Yahoo Finance's public data, without an account. Some exchanges are a few minutes behind.
+
+<img src="docs/screenshots/settings-stocks.png" alt="Stocks settings" width="260">
+
+### Currency
+
+<img src="docs/screenshots/widget-currency.png" alt="Currency widget" width="160"> <img src="docs/screenshots/dark/widget-currency.png" alt="Currency widget, dark" width="160">
+
+- Converts an **amount** from one currency to another at the **live rate**, refreshed every 5 seconds, with today's chart of the rate and its change. The result flashes green or red when the rate moves.
+- In settings: type the amount (100, 2.50 or 2,50), click **From** or **To** and pick the currency. The round button swaps them.
+- Euro, US Dollar, British Pound, Brazilian Real, Swiss Franc, Japanese Yen, Canadian and Australian Dollar, Chinese Yuan, Indian Rupee, Mexican Peso, Angolan Kwanza, Bitcoin and Ethereum.
+- Currencies trade on weekdays (the chip says **Closed** at the weekend); crypto every day. Rates from Yahoo Finance.
+
+<img src="docs/screenshots/settings-currency.png" alt="Currency settings" width="260">
+
+### Photos
+
+<img src="docs/screenshots/widget-photos.png" alt="Photos widget" width="160">
+
+- Your photos take turns filling the widget, with a soft crossfade and a slow zoom.
+- **Up to 5 photo frames** on the desktop (*Frames on the desktop* in settings). Each frame has **its own photos and options**: pick a frame under *Editing frame* and it shows its number on the desktop so you know which one it is.
+- **Add photos** or **Add folder** (subfolders included). New photos added to a folder join in by themselves.
+- **Change every** 5 s, 15 s, 1 min or 5 min; **Square** or **Wide** (for landscape photos); **Shuffle** or by name.
+- Phone photos are shown the right way up. The photos never leave the PC.
+
+<img src="docs/screenshots/settings-photos.png" alt="Photos settings" width="260">
+
 ## Dark mode
 
 Turn on **Dark mode** in the menu, under *App*. The menu and every widget on the desktop change right away, and the choice is saved.
 
-The widgets become smoked dark glass with white text, and keep the logo colors in the clock hands, rings, today's date, the play button and the progress bar.
+The widgets become smoked dark glass with white text, and keep the logo colors in the clock hands, rings, today's date, the play button and the progress bar. The green and red of prices stay the same.
 
 <p align="center">
   <img src="docs/screenshots/dark/widget-clock.png" alt="Clock widget, dark" title="Clock" width="19%">
@@ -116,6 +156,11 @@ The widgets become smoked dark glass with white text, and keep the logo colors i
   <img src="docs/screenshots/dark/widget-calendar.png" alt="Calendar widget, dark" title="Calendar" width="19%">
   <img src="docs/screenshots/dark/widget-weather.png" alt="Weather widget, dark" title="Weather" width="19%">
   <img src="docs/screenshots/dark/widget-music.png" alt="Music widget, dark" title="Music" width="19%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/dark/widget-stocks-wide.png" alt="Stocks widget, dark" title="Stocks" width="39%">
+  <img src="docs/screenshots/dark/widget-currency.png" alt="Currency widget, dark" title="Currency" width="19%">
+  <img src="docs/screenshots/dark/widget-photos.png" alt="Photos widget, dark" title="Photos" width="19%">
 </p>
 
 <p align="center">
