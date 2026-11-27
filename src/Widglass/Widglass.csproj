@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -13,7 +13,7 @@
     <AssemblyName>Widglass</AssemblyName>
     <RootNamespace>Widglass</RootNamespace>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Product>Widglass</Product>
     <Description>macOS-style desktop widgets for Windows, pinned to the wallpaper</Description>
   </PropertyGroup>
