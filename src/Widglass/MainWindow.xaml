@@ -78,7 +78,7 @@
                 <TextBlock x:Name="Summary" DockPanel.Dock="Bottom" HorizontalAlignment="Center" Margin="0,8,0,0"
                            FontSize="13" Foreground="{DynamicResource MenuInkSoft}" />
 
-                <!-- App options: dark mode and start with Windows, one card like iOS settings -->
+                <!-- App options: dark mode and start with Windows, one card like iOS settings. Updates install by themselves. -->
                 <StackPanel DockPanel.Dock="Bottom">
                     <TextBlock Text="APP" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource MenuInkSoft}" Margin="6,6,0,8" />
                     <Border CornerRadius="22" Background="{DynamicResource MenuCardBrush}" BorderBrush="{DynamicResource MenuCardBorderBrush}"
@@ -138,35 +138,6 @@
                                       ToolTip="Open the widgets when the PC starts (the menu stays in the tray)"
                                       Checked="StartWithWindows_Changed" Unchecked="StartWithWindows_Changed" />
                         </Grid>
-
-                        <Border Height="1" Background="{DynamicResource MenuDividerBrush}" Margin="54,10,0,10" />
-
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Border Width="40" Height="40" CornerRadius="12">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                        <GradientStop Color="#FF5FA8" Offset="0" />
-                                        <GradientStop Color="#FFB13D" Offset="1" />
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                                <Border.Effect>
-                                    <DropShadowEffect BlurRadius="8" ShadowDepth="2" Direction="270" Opacity="0.22" Color="#3C2882" />
-                                </Border.Effect>
-                                <TextBlock Text="&#xE895;" FontFamily="{StaticResource IconFont}" FontSize="18"
-                                           Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                            <TextBlock Grid.Column="1" Text="Auto-install updates" FontSize="18" FontWeight="SemiBold"
-                                       VerticalAlignment="Center" Margin="14,0,0,0" />
-                            <CheckBox x:Name="AutoUpdateToggle" Grid.Column="2" Style="{StaticResource AppleToggle}" VerticalAlignment="Center"
-                                      AutomationProperties.Name="Auto-install updates"
-                                      ToolTip="Install new versions by themselves. When off, Widglass tells you and you choose."
-                                      Checked="AutoUpdate_Changed" Unchecked="AutoUpdate_Changed" />
-                        </Grid>
                       </StackPanel>
                     </Border>
                 </StackPanel>
@@ -213,11 +184,21 @@
                     </Grid>
                 </Border>
 
-                <!-- Widget list: click a row to open its settings, click the switch to show/hide it -->
+                <!-- Widget list: click a row to open its settings, click the switch to show/hide it.
+                     The window keeps its height; more widgets scroll. -->
+                <ScrollViewer x:Name="WidgetScroll" Style="{StaticResource GlassScroll}" Margin="0,0,-16,0">
+                    <!-- Soft fade at the bottom hints that more widgets are below -->
+                    <ScrollViewer.OpacityMask>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Offset="0" Color="Black" />
+                            <GradientStop Offset="0.95" Color="Black" />
+                            <GradientStop Offset="1" Color="Transparent" />
+                        </LinearGradientBrush>
+                    </ScrollViewer.OpacityMask>
                 <ItemsControl x:Name="WidgetList">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Padding="14,12,16,12" Margin="0,0,0,10" Cursor="Hand"
+                            <Border Padding="14,9,16,9" Margin="0,0,0,8" Cursor="Hand"
                                     MouseLeftButtonUp="WidgetRow_MouseLeftButtonUp" ToolTip="Open settings">
                                 <Border.Style>
                                     <Style TargetType="Border">
@@ -258,6 +239,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                </ScrollViewer>
                 </DockPanel>
 
                 <!-- Page 2: settings of one widget (DataContext = the WidgetOption) -->
@@ -311,7 +293,8 @@
                         </Grid>
                     </Border>
 
-                    <!-- Settings area: one set of options per widget -->
+                    <!-- Settings area: one set of options per widget (scrolls if it's taller than the window) -->
+                    <ScrollViewer x:Name="SettingsScroll" Style="{StaticResource GlassScroll}" Margin="0,0,-16,0">
                     <Border CornerRadius="22" Background="{DynamicResource MenuPanelBrush}" BorderBrush="{DynamicResource MenuCardBorderBrush}" BorderThickness="1" Padding="18,14"
                             VerticalAlignment="Top">
                         <StackPanel>
@@ -319,6 +302,7 @@
                             <ContentControl x:Name="SettingsHost" />
                         </StackPanel>
                     </Border>
+                    </ScrollViewer>
                 </DockPanel>
                 </Grid>
             </DockPanel>

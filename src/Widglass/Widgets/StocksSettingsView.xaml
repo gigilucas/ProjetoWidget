@@ -1,0 +1,159 @@
+<UserControl x:Class="Widglass.Widgets.StocksSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FontFamily="{StaticResource UiFont}" Foreground="{DynamicResource MenuInk}">
+    <UserControl.Resources>
+        <!-- Small glass pill for popular picks -->
+        <Style x:Key="PickChip" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Margin" Value="0,0,6,6" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Pill" CornerRadius="11" Background="{DynamicResource MenuPillBrush}"
+                                BorderBrush="{DynamicResource MenuCardBorderBrush}" BorderThickness="1" Padding="9,3">
+                            <TextBlock Text="{TemplateBinding Content}" FontSize="12.5" FontWeight="SemiBold" Foreground="{DynamicResource MenuInk}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{DynamicResource MenuPillHoverBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- One search result row -->
+        <Style x:Key="ResultRow" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Row" CornerRadius="12" Background="Transparent" Padding="8,5">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Row" Property="Background" Value="{DynamicResource MenuRowHoverBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel>
+        <!-- How many stocks -->
+        <TextBlock Text="Show" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,8" />
+        <Border CornerRadius="14" Background="{DynamicResource MenuPanelBrush}" BorderBrush="{DynamicResource MenuCardBorderBrush}" BorderThickness="1" Padding="3">
+            <UniformGrid Columns="3">
+                <RadioButton x:Name="Count1" Style="{StaticResource SegmentOption}" Content="1 stock" GroupName="StockCount" Checked="Count_Checked" />
+                <RadioButton x:Name="Count2" Style="{StaticResource SegmentOption}" Content="2 stocks" GroupName="StockCount" Checked="Count_Checked" />
+                <RadioButton x:Name="Count3" Style="{StaticResource SegmentOption}" Content="3 stocks" GroupName="StockCount" Checked="Count_Checked" />
+            </UniformGrid>
+        </Border>
+        <TextBlock x:Name="CountHint" FontSize="12" Foreground="{DynamicResource MenuInkSoft}" TextWrapping="Wrap" Margin="2,6,0,10" />
+
+        <!-- The chosen stocks: click one to change it -->
+        <ItemsControl x:Name="Slots" Margin="-4,0,-4,6">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <RadioButton GroupName="StockSlot" IsChecked="{Binding IsSelected, Mode=OneWay}" Checked="Slot_Checked" Tag="{Binding Index}"
+                                 Cursor="Hand" FocusVisualStyle="{x:Null}">
+                        <RadioButton.Template>
+                            <ControlTemplate TargetType="RadioButton">
+                                <Border x:Name="Row" CornerRadius="12" Padding="8,6" Margin="0,0,0,3" BorderThickness="1" BorderBrush="Transparent" Background="Transparent">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="20" Height="20" CornerRadius="10" Background="{StaticResource LogoGradient}">
+                                            <TextBlock Text="{Binding Number}" FontSize="11" FontWeight="Bold" Foreground="White"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Text="{Binding Symbol}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource MenuInk}"
+                                                   Margin="10,0,0,0" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="12.5" Foreground="{DynamicResource MenuInkSoft}"
+                                                   Margin="8,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock x:Name="Hint" Grid.Column="3" Text="Change ›" FontSize="12" Foreground="{DynamicResource MenuInkSoft}"
+                                                   VerticalAlignment="Center" Visibility="Hidden" />
+                                    </Grid>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Row" Property="Background" Value="{DynamicResource MenuRowHoverBrush}" />
+                                        <Setter TargetName="Hint" Property="Visibility" Value="Visible" />
+                                    </Trigger>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter TargetName="Row" Property="Background" Value="{DynamicResource MenuRowSelectedBrush}" />
+                                        <Setter TargetName="Row" Property="BorderBrush" Value="{DynamicResource MenuCardBorderHoverBrush}" />
+                                        <Setter TargetName="Hint" Property="Visibility" Value="Visible" />
+                                        <Setter TargetName="Hint" Property="Text" Value="Changing" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </RadioButton.Template>
+                    </RadioButton>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Search -->
+        <Grid>
+            <Border CornerRadius="12" Background="{DynamicResource MenuPanelBrush}" BorderBrush="{DynamicResource MenuCardBorderBrush}" BorderThickness="1" />
+            <TextBlock Text="&#xE721;" FontFamily="{StaticResource IconFont}" FontSize="13" Foreground="{DynamicResource MenuInkSoft}"
+                       VerticalAlignment="Center" Margin="11,0,0,0" IsHitTestVisible="False" />
+            <TextBlock x:Name="Placeholder" Text="Search a company, symbol or crypto" FontSize="13.5" Foreground="{DynamicResource MenuInkSoft}"
+                       VerticalAlignment="Center" Margin="32,0,10,0" IsHitTestVisible="False" />
+            <TextBox x:Name="SearchBox" FontSize="13.5" Foreground="{DynamicResource MenuInk}" CaretBrush="{DynamicResource MenuInk}"
+                     Background="Transparent" BorderThickness="0" Padding="28,8,10,8" VerticalContentAlignment="Center"
+                     TextChanged="SearchBox_TextChanged" AutomationProperties.Name="Search stocks" />
+        </Grid>
+
+        <!-- Results -->
+        <ItemsControl x:Name="Results" Margin="-4,6,-4,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Button Style="{StaticResource ResultRow}" Click="Result_Click" Tag="{Binding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Symbol}" FontSize="13.5" FontWeight="Bold" Foreground="{DynamicResource MenuInk}" MinWidth="64" />
+                            <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13" Foreground="{DynamicResource MenuInkSoft}"
+                                       TextTrimming="CharacterEllipsis" Margin="6,0" />
+                            <TextBlock Grid.Column="2" FontSize="11.5" Foreground="{DynamicResource MenuInkSoft}">
+                                <Run Text="{Binding Kind, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding Exchange, Mode=OneWay}" />
+                            </TextBlock>
+                        </Grid>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock x:Name="SearchStatus" FontSize="12.5" Foreground="{DynamicResource MenuInkSoft}" Margin="2,4,0,0" Visibility="Collapsed" />
+
+        <!-- Popular picks -->
+        <TextBlock Text="Popular" FontSize="12.5" Foreground="{DynamicResource MenuInkSoft}" Margin="0,10,0,6" />
+        <WrapPanel x:Name="Picks">
+            <Button Style="{StaticResource PickChip}" Content="AAPL" Tag="AAPL|Apple Inc." Click="Pick_Click" />
+            <Button Style="{StaticResource PickChip}" Content="MSFT" Tag="MSFT|Microsoft Corporation" Click="Pick_Click" />
+            <Button Style="{StaticResource PickChip}" Content="NVDA" Tag="NVDA|NVIDIA Corporation" Click="Pick_Click" />
+            <Button Style="{StaticResource PickChip}" Content="TSLA" Tag="TSLA|Tesla, Inc." Click="Pick_Click" />
+            <Button Style="{StaticResource PickChip}" Content="Bitcoin" Tag="BTC-USD|Bitcoin USD" Click="Pick_Click" />
+            <Button Style="{StaticResource PickChip}" Content="S&amp;P 500" Tag="^GSPC|S&amp;P 500" Click="Pick_Click" />
+        </WrapPanel>
+
+        <TextBlock Text="Live prices from Yahoo Finance, refreshed every few seconds while the market is open (some exchanges are a few minutes behind)."
+                   FontSize="12" Foreground="{DynamicResource MenuInkSoft}" TextWrapping="Wrap" Margin="2,8,0,0" />
+    </StackPanel>
+</UserControl>

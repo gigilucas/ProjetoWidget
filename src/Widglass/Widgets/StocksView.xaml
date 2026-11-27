@@ -1,0 +1,66 @@
+<UserControl x:Class="Widglass.Widgets.StocksView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Widglass.Widgets"
+             FontFamily="{StaticResource UiFont}" Foreground="{DynamicResource InkBrush}">
+    <Grid>
+        <!-- One stock: square -->
+        <DockPanel x:Name="SingleView" Visibility="Collapsed">
+            <Grid DockPanel.Dock="Top">
+                <StackPanel Margin="2,0,70,0">
+                    <TextBlock x:Name="SymbolText" FontSize="16" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="NameText" FontSize="11" Foreground="{DynamicResource InkSoftBrush}" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <Border HorizontalAlignment="Right" VerticalAlignment="Top" CornerRadius="10" Background="{DynamicResource WidgetChipBrush}"
+                        BorderBrush="{DynamicResource WidgetChipBorderBrush}" BorderThickness="1" Padding="7,2,8,3">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse x:Name="MarketDot" Width="6" Height="6" VerticalAlignment="Center" />
+                        <TextBlock x:Name="MarketText" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource InkSoftBrush}" Margin="5,0,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <StackPanel DockPanel.Dock="Top" Margin="2,6,0,4">
+                <!-- Flashes green/red when the price changes, like Yahoo Finance -->
+                <Border x:Name="PriceFlash" HorizontalAlignment="Left" CornerRadius="8" Padding="4,0" Margin="-4,0,0,0" Background="Transparent">
+                    <TextBlock x:Name="PriceText" FontSize="27" FontWeight="SemiBold" />
+                </Border>
+                <StackPanel Orientation="Horizontal" Margin="0,-2,0,0">
+                    <TextBlock x:Name="ChangeText" FontSize="12.5" FontWeight="SemiBold" />
+                    <TextBlock Text="Today" FontSize="12" Foreground="{DynamicResource InkSoftBrush}" Margin="6,0,0,0" />
+                </StackPanel>
+            </StackPanel>
+
+            <local:StockChart x:Name="Chart" Margin="0,2,0,0" />
+        </DockPanel>
+
+        <!-- Two or three stocks: wide, one row each (filled in code) -->
+        <DockPanel x:Name="ListView" Visibility="Collapsed">
+            <Grid DockPanel.Dock="Top" Margin="2,0,0,4">
+                <TextBlock Text="STOCKS" FontSize="11.5" FontWeight="Bold" Foreground="{DynamicResource InkSoftBrush}" VerticalAlignment="Center" />
+                <Border HorizontalAlignment="Right" CornerRadius="10" Background="{DynamicResource WidgetChipBrush}"
+                        BorderBrush="{DynamicResource WidgetChipBorderBrush}" BorderThickness="1" Padding="7,2,8,3">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse x:Name="ListMarketDot" Width="6" Height="6" VerticalAlignment="Center" />
+                        <TextBlock x:Name="ListMarketText" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource InkSoftBrush}" Margin="5,0,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+            <Grid x:Name="Rows" />
+        </DockPanel>
+
+        <!-- Loading / no data -->
+        <StackPanel x:Name="MessageView" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Border Width="54" Height="54" CornerRadius="16" Background="{StaticResource LogoGradient}" HorizontalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="4" Direction="270" Opacity="0.3" Color="#3C2882" />
+                </Border.Effect>
+                <TextBlock Text="&#xEAFC;" FontFamily="{StaticResource IconFont}" FontSize="24" Foreground="White"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock x:Name="MessageTitle" Text="Loading…" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0" />
+            <TextBlock x:Name="MessageText" FontSize="11.5" Foreground="{DynamicResource InkSoftBrush}" HorizontalAlignment="Center"
+                       TextAlignment="Center" TextWrapping="Wrap" MaxWidth="170" Margin="0,2,0,0" />
+        </StackPanel>
+    </Grid>
+</UserControl>

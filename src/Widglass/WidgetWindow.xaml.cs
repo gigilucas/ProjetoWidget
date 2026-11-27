@@ -11,13 +11,19 @@ public partial class WidgetWindow : Window
     /// <summary>Space around the card inside the window, used by the drop shadow.</summary>
     public const double ShadowMargin = 16;
 
+    /// <summary>Window width of a square widget (220 px card) and of a wide one (two squares and the gap between them).</summary>
+    public const double SquareWidth = 252;
+    public const double WideWidth = 488;
+
     private Point? _grab; // where on the window the mouse grabbed it, while dragging
 
-    public WidgetWindow(WidgetOption widget)
+    /// <param name="instance">Which copy of the widget, from 0 (only Photos has more than one: up to 5 frames).</param>
+    public WidgetWindow(WidgetOption widget, int instance = 0)
     {
         InitializeComponent();
         Widget = widget;
-        Title = widget.Name;
+        Instance = instance;
+        Title = instance == 0 ? widget.Name : $"{widget.Name} {instance + 1}";
         Host.Content = widget.Id switch
         {
             "clock" => new Widgets.ClockView(),
@@ -25,10 +31,21 @@ public partial class WidgetWindow : Window
             "cpu-ram" => new Widgets.CpuRamView(),
             "weather" => new Widgets.WeatherView(),
             "music" => new Widgets.MusicView(),
+            "stocks" => new Widgets.StocksView(),
+            "currency" => new Widgets.CurrencyView(),
+            "photos" => new Widgets.PhotosView(instance),
             _ => null,
         };
         // Music has buttons; clicks elsewhere on it still drag the widget.
         Host.IsHitTestVisible = Host.Content is Widgets.MusicView;
+
+        // Some widgets can be a wide rectangle instead of a square
+        if (IsWide(widget.Id, instance))
+            Width = WideWidth;
+
+        // Photos fill the whole card, just inside the glass rim
+        if (widget.Id == "photos")
+            Host.Margin = new Thickness(1.5);
 
         // Stuck to the desktop: behind all windows, still there on Win+D.
         DesktopPin.Attach(this);
@@ -36,11 +53,40 @@ public partial class WidgetWindow : Window
 
     public WidgetOption Widget { get; }
 
+    /// <summary>Which copy of the widget this is, from 0.</summary>
+    public int Instance { get; }
+
+    /// <summary>Name under which this window's spot is saved: "photos", "photos-2", ...</summary>
+    public string Key => KeyFor(Widget.Id, Instance);
+
+    public static string KeyFor(string id, int instance) => instance == 0 ? id : $"{id}-{instance + 1}";
+
+    /// <summary>Stocks with 2-3 stocks, and photo frames set to wide.</summary>
+    private static bool IsWide(string id, int instance) => id switch
+    {
+        "stocks" => Settings.Current.ActiveStocks.Count > 1,
+        "photos" => Settings.Current.Frame(instance).Wide,
+        _ => false,
+    };
+
     /// <summary>Cards of the other widgets on screen, which this one may touch but not cover.</summary>
     public Func<IEnumerable<Rect>> Obstacles { get; set; } = () => [];
 
     /// <summary>Raised after the user finishes dragging the widget to a new spot.</summary>
     public event EventHandler? Moved;
+
+    /// <summary>
+    /// Switches between square and wide. The widget grows from where it is, then slides if needed
+    /// so it stays whole on the screen and doesn't cover another widget.
+    /// </summary>
+    public void SetWide(bool wide)
+    {
+        var width = wide ? WideWidth : SquareWidth;
+        if (Math.Abs(Width - width) < 0.5) return;
+        Width = width;
+        (Left, Top) = Place(Left, Top);
+        Moved?.Invoke(this, EventArgs.Empty);
+    }
 
     /// <summary>The visible glass card, in screen coordinates (without the shadow margin).</summary>
     public Rect Card => CardAt(Left, Top, Width, Height);

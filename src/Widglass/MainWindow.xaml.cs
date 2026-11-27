@@ -28,6 +28,9 @@ public partial class MainWindow : Window
             new("calendar", "Calendar",  "", "#FF5FA8", "#FFB13D"),
             new("weather",  "Weather",   "", "#FFB13D", "#FF8A3D"),
             new("music",    "Music",     "", "#4F7CFF", "#FF5FA8"),
+            new("stocks",   "Stocks",    "\uEAFC", "#2ECC71", "#4F7CFF"),
+            new("currency", "Currency",  "\uE8AB", "#FFB13D", "#2ECC71"),
+            new("photos",   "Photos",    "\uE91B", "#3FB8FF", "#FF5FA8"),
         ];
 
         foreach (var widget in _widgets)
@@ -39,7 +42,6 @@ public partial class MainWindow : Window
         WidgetList.ItemsSource = _widgets;
         DarkModeToggle.IsChecked = _settings.DarkMode;
         StartWithWindowsToggle.IsChecked = _settings.StartWithWindows;
-        AutoUpdateToggle.IsChecked = _settings.AutoInstallUpdates;
         UpdateSummary();
 
         // Dev aid: "Widglass.exe --screenshot out.png" saves an image of the window and exits.
@@ -74,9 +76,13 @@ public partial class MainWindow : Window
         }
 
         // Dev aid: "--widget clock" (with --screenshot) captures that widget instead of this window.
+        // "--widget photos-2" captures the second photo frame.
         var w = Array.IndexOf(args, "--widget");
+        var captureInstance = 0;
         var widgetToCapture = _screenshotMode && w >= 0 && w + 1 < args.Length
-            ? _widgets.FirstOrDefault(x => x.Id == args[w + 1])
+            ? _widgets.FirstOrDefault(x => x.Id == args[w + 1]) ??
+              _widgets.FirstOrDefault(x => args[w + 1].StartsWith(x.Id + "-") &&
+                                           int.TryParse(args[w + 1][(x.Id.Length + 1)..], out captureInstance) && --captureInstance > 0)
             : null;
 
         if (_screenshotMode)
@@ -86,7 +92,7 @@ public partial class MainWindow : Window
                 WidgetWindow? widgetWindow = null;
                 if (widgetToCapture is not null)
                 {
-                    widgetWindow = new WidgetWindow(widgetToCapture) { Left = -4000, Top = -4000 };
+                    widgetWindow = new WidgetWindow(widgetToCapture, captureInstance) { Left = -4000, Top = -4000 };
                     widgetWindow.Show();
                     target = widgetWindow;
                 }
@@ -127,7 +133,21 @@ public partial class MainWindow : Window
     {
         foreach (var widget in _widgets.Where(w => w.IsOn))
             ShowWidget(widget);
+        Settings.Changed += SyncPhotoFrames;
         StartUpdateChecks();
+    }
+
+    /// <summary>How many windows a widget has on the desktop: Photos can have up to 5 frames, the rest one.</summary>
+    private int InstanceCount(WidgetOption widget) => widget.Id == "photos" ? _settings.PhotoFrameCount : 1;
+
+    /// <summary>The number of photo frames changed in settings: open the new ones, close the extra ones.</summary>
+    private void SyncPhotoFrames()
+    {
+        if (_widgets.FirstOrDefault(w => w.Id == "photos") is not { IsOn: true } photos) return;
+        ShowWidget(photos);
+        for (var i = InstanceCount(photos); i < Settings.MaxPhotoFrames; i++)
+            if (_openWidgets.Remove(WidgetWindow.KeyFor(photos.Id, i), out var extra))
+                extra.Close();
     }
 
     /// <summary>Shows the menu and brings it to the front (from the tray icon or a second launch).</summary>
@@ -155,13 +175,23 @@ public partial class MainWindow : Window
 
     private void ShowWidget(WidgetOption widget)
     {
-        if (_openWidgets.ContainsKey(widget.Id))
+        for (var i = 0; i < InstanceCount(widget); i++)
+            ShowWindow(widget, i);
+    }
+
+    private void ShowWindow(WidgetOption widget, int instance)
+    {
+        var key = WidgetWindow.KeyFor(widget.Id, instance);
+        if (_openWidgets.ContainsKey(key))
             return;
 
-        var window = new WidgetWindow(widget) { WindowStartupLocation = WindowStartupLocation.Manual };
-        var (left, top) = _settings.TryGetPosition(widget.Id, out var savedLeft, out var savedTop)
+        var window = new WidgetWindow(widget, instance) { WindowStartupLocation = WindowStartupLocation.Manual };
+        var (left, top) = _settings.TryGetPosition(key, out var savedLeft, out var savedTop)
             ? (savedLeft, savedTop)
-            : DefaultPosition(_widgets.IndexOf(widget), window.Width, window.Height);
+            // A new photo frame starts next to the previous one; FreeSpot then finds room
+            : instance > 0 && _openWidgets.TryGetValue(WidgetWindow.KeyFor(widget.Id, instance - 1), out var previous)
+                ? (previous.Left - window.Width + 2 * WidgetWindow.ShadowMargin, previous.Top)
+                : DefaultPosition(_widgets.IndexOf(widget), window.Width, window.Height);
 
         // Widgets may touch but never cover each other.
         var others = () => _openWidgets.Values.Where(w => w != window).Select(w => w.Card);
@@ -170,26 +200,29 @@ public partial class MainWindow : Window
 
         window.Moved += (_, _) =>
         {
-            _settings.SetPosition(widget.Id, window.Left, window.Top);
+            _settings.SetPosition(key, window.Left, window.Top);
             _settings.Save();
         };
         // If the user closes the widget some other way (e.g. Alt+F4), switch it off too.
-        // Not when the app or Windows is closing: then the switches must stay as they are.
+        // Not when the app or Windows is closing, or when the app closed it itself (switch off,
+        // fewer photo frames): then it's already out of the list.
         window.Closed += (_, _) =>
         {
-            _openWidgets.Remove(widget.Id);
-            if (!_shuttingDown && !Dispatcher.HasShutdownStarted)
+            if (_openWidgets.Remove(key) && !_shuttingDown && !Dispatcher.HasShutdownStarted)
                 widget.IsOn = false;
         };
 
-        _openWidgets[widget.Id] = window;
+        _openWidgets[key] = window;
         window.Show();
     }
 
     private void HideWidget(WidgetOption widget)
     {
-        if (_openWidgets.Remove(widget.Id, out var window))
+        foreach (var window in _openWidgets.Values.Where(w => w.Widget == widget).ToList())
+        {
+            _openWidgets.Remove(window.Key);
             window.Close();
+        }
     }
 
     /// <summary>
@@ -227,7 +260,7 @@ public partial class MainWindow : Window
         foreach (var window in _openWidgets.Values.ToList())
         {
             var others = _openWidgets.Values.Where(w => w != window).Select(w => w.Card).ToList();
-            var (left, top) = _settings.TryGetPosition(window.Widget.Id, out var savedLeft, out var savedTop)
+            var (left, top) = _settings.TryGetPosition(window.Key, out var savedLeft, out var savedTop)
                 ? (savedLeft, savedTop)
                 : (window.Left, window.Top);
             (window.Left, window.Top) = FreeSpot(left, top, window.Width, window.Height, others);
@@ -317,6 +350,7 @@ public partial class MainWindow : Window
     private void ShowSettingsFor(WidgetOption widget)
     {
         DetailPage.DataContext = widget;
+        SettingsScroll.ScrollToTop();
         SettingsHost.Content = widget.Id switch
         {
             "clock" => new Widgets.ClockSettingsView(),
@@ -324,6 +358,9 @@ public partial class MainWindow : Window
             "cpu-ram" => new Widgets.CpuRamSettingsView(),
             "weather" => new Widgets.WeatherSettingsView(),
             "music" => new Widgets.MusicSettingsView(),
+            "stocks" => new Widgets.StocksSettingsView(),
+            "currency" => new Widgets.CurrencySettingsView(),
+            "photos" => new Widgets.PhotosSettingsView(),
             _ => NothingToSet(),
         };
     }
@@ -411,8 +448,8 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// Looks for a newer version. If there is one: installs it right away when "Auto-install updates" is on,
-    /// otherwise shows it in the menu and as a notification.
+    /// Looks for a newer version and installs it right away: everyone always has the latest Widglass.
+    /// The menu shows the progress, and a notification says when it's done.
     /// </summary>
     public async Task CheckForUpdatesAsync(bool userAsked, bool allowAutoInstall = true)
     {
@@ -436,14 +473,11 @@ public partial class MainWindow : Window
             return;
         }
 
-        var isNew = _pendingUpdate?.Version != update.Version;
         _pendingUpdate = update;
         ShowUpdateBanner(update);
 
-        if (allowAutoInstall && _settings.AutoInstallUpdates)
+        if (allowAutoInstall)
             await InstallUpdateAsync();
-        else if (isNew || userAsked)
-            Tray?.Notify("Widglass update available", $"Version {update.VersionText} is ready. Click here to update.", ShowMenu);
     }
 
     private void ShowUpdateBanner(Services.UpdateInfo update)
@@ -484,13 +518,4 @@ public partial class MainWindow : Window
         }
     }
 
-    private void AutoUpdate_Changed(object sender, RoutedEventArgs e)
-    {
-        var on = AutoUpdateToggle.IsChecked == true;
-        if (_settings.AutoInstallUpdates == on) return;
-        _settings.AutoInstallUpdates = on;
-        _settings.Save();
-        if (on && _pendingUpdate is not null)
-            _ = InstallUpdateAsync();
-    }
 }

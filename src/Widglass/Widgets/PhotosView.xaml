@@ -1,0 +1,37 @@
+<UserControl x:Class="Widglass.Widgets.PhotosView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FontFamily="{StaticResource UiFont}" Foreground="{DynamicResource InkBrush}">
+    <!-- The photo fills the whole card, inside the glass rim (the window gives this view no padding) -->
+    <Grid>
+        <Border x:Name="LayerA" CornerRadius="46.5" Opacity="0" />
+        <Border x:Name="LayerB" CornerRadius="46.5" Opacity="0" />
+
+        <!-- Thin light rim over the photo so it still reads as glass -->
+        <Border x:Name="Rim" CornerRadius="46.5" BorderThickness="1" BorderBrush="#40FFFFFF" IsHitTestVisible="False" Visibility="Collapsed" Panel.ZIndex="10" />
+
+        <!-- Frame number, shown for a moment when this frame is picked in settings -->
+        <Border x:Name="Badge" HorizontalAlignment="Center" VerticalAlignment="Center" Width="64" Height="64" CornerRadius="32"
+                Background="{StaticResource LogoGradient}" Opacity="0" IsHitTestVisible="False" Panel.ZIndex="12">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="16" ShadowDepth="4" Direction="270" Opacity="0.4" Color="#3C2882" />
+            </Border.Effect>
+            <TextBlock x:Name="BadgeText" FontSize="30" FontWeight="Bold" Foreground="White"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+
+        <!-- No photos yet -->
+        <StackPanel x:Name="MessageView" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="16" Panel.ZIndex="11">
+            <Border Width="54" Height="54" CornerRadius="16" Background="{StaticResource LogoGradient}" HorizontalAlignment="Center">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="12" ShadowDepth="4" Direction="270" Opacity="0.3" Color="#3C2882" />
+                </Border.Effect>
+                <TextBlock Text="&#xE91B;" FontFamily="{StaticResource IconFont}" FontSize="24" Foreground="White"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock x:Name="MessageTitle" Text="No photos yet" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0" />
+            <TextBlock x:Name="MessageText" Text="Pick photos or a folder in settings." FontSize="11.5" Foreground="{DynamicResource InkSoftBrush}"
+                       HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="170" Margin="0,2,0,0" />
+        </StackPanel>
+    </Grid>
+</UserControl>
